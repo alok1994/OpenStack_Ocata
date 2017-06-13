@@ -12,6 +12,9 @@ tenant_name = 'admin'
 network = 'net1'
 subnet_name = "Snet"
 subnet = "10.2.0.0/24"
+grid_ip = "10.39.12.233"
+grid_master_name = "infoblox.localdomain"
+
 
 class TestOpenStackCases(unittest.TestCase):
     @classmethod
@@ -143,3 +146,11 @@ class TestOpenStackCases(unittest.TestCase):
 	flag = proc.get_subnet_name(subnet_name)
         assert flag == subnet_name
 
+    @pytest.mark.run(order=12)
+    def test_validate_member_assiged_network(self):
+	proc = util.utils()
+	resp = json.loads(wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet))
+	ref_v = resp[0]['_ref']
+	members = json.loads(wapi_module.wapi_request('GET',object_type = ref_v+'?_return_fields=members'))
+	name = members['members'][0]['name']
+	assert grid_master_name == name, "Member has not been assign to Netwrok"
