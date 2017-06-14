@@ -159,4 +159,20 @@ class TestOpenStackCases(unittest.TestCase):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v[0]['fqdn']
 	assert tenant_name+'.cloud.global.com' == zone_name
-		
+
+    @pytest.mark.run(order=14)
+    def test_validate_zone_EAs(self):
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        ref = ref_v[0]['_ref']
+	EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=extattrs'))
+	tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+	tenant_id_nios = EAs['extattrs']['Tenant ID']['value']		
+	cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+	cloud_api_owned_nios = EAs['extattrs']['Cloud API Owned']['value']
+	session = util.utils()
+        tenant_id_openstack = session.get_tenant_id(network)
+	assert tenant_id_openstack == tenant_id_nios and \
+               tenant_name_nios == tenant_name and \
+	       cmp_type_nios == 'OpenStack' and \
+	       cloud_api_owned_nios == 'True'
+
