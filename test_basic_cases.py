@@ -156,4 +156,7 @@ class TestOpenStackCases(unittest.TestCase):
 	
     @pytest.mark.run(order=13)
     def test_validate_zone_name(self):
-	zone = wapi_module.wapi_request('GET',object_type='zone')	
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+	zone_name = ref_v[0]['fqdn']
+	assert tenant_name+'.cloud.global.com' == zone_name
+		
