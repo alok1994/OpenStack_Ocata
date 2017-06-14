@@ -148,9 +148,12 @@ class TestOpenStackCases(unittest.TestCase):
 
     @pytest.mark.run(order=12)
     def test_validate_member_assiged_network(self):
-	proc = util.utils()
 	resp = json.loads(wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet))
 	ref_v = resp[0]['_ref']
 	members = json.loads(wapi_module.wapi_request('GET',object_type = ref_v+'?_return_fields=members'))
 	name = members['members'][0]['name']
 	assert grid_master_name == name, "Member has not been assign to Netwrok"
+	
+    @pytest.mark.run(order=13)
+    def test_validate_zone_name(self):
+	zone = wapi_module.wapi_request('GET',object_type='zone')	
