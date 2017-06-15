@@ -3,7 +3,7 @@ from keystoneauth1 import session
 from neutronclient.v2_0 import client
 import os,sys
 from novaclient.client import Client
-
+import time
 #os.system('export OS_USERNAME=admin')
 #os.system('export OS_PASSWORD=admin')
 #os.system('export OS_TENANT_NAME=admin')
@@ -91,11 +91,12 @@ class utils:
         
               It takes Instance Name and the Network Name it should be associated with as arguments.
             """
-            image = self.nova_client.images.find(name="cirros-0.3.3-x86_64-disk")
+            image = self.nova_client.images.find(name="cirros-0.3.4-x86_64-uec")
             flavor = self.nova_client.flavors.find(name="m1.tiny")
             net_id  = self.get_network_id(net_name)
+	    nic_id = [{'net-id': net_id}]
             instance = self.nova_client.servers.create(name=name, image=image,\
-                                                       flavor=flavor, nics=nic_d)
+                                                       flavor=flavor, nics=nic_id)
             time.sleep(60)
             return instance
 

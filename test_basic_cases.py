@@ -176,3 +176,9 @@ class TestOpenStackCases(unittest.TestCase):
 	       cmp_type_nios == 'OpenStack' and \
 	       cloud_api_owned_nios == 'True'
 
+	# EAs 'Default Host Name Pattern': host-{ip_address}
+    @pytest.mark.run(order=15)
+    def test_deploy_instnace_host_name_pattern_host_ip_address(self):
+	proc = util.utils()
+	proc.launch_instance('inst',network)
+	
