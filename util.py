@@ -98,7 +98,7 @@ class utils:
             instance = self.nova_client.servers.create(name=name, image=image,\
                                                        flavor=flavor, nics=nic_id)
             time.sleep(60)
-            return instance
+            #return instance
 
         def get_servers_list(self):
             """
@@ -115,11 +115,19 @@ class utils:
             for s in servers_list:
                 if s.name == name:
                     server_exists = True
+		    return name
                     break
             if not server_exists:
                 return None
             else:
                 return s
+
+	def get_server_name(self, name):
+            """
+              Return Server Object for a given instance name
+            """
+            servers_list = self.get_server(name)
+	    return servers_list
 
 	def terminate_instance(self, name):
             """

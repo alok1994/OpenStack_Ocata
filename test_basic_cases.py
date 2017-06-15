@@ -11,6 +11,7 @@ from netaddr import IPNetwork
 tenant_name = 'admin'
 network = 'net1'
 subnet_name = "Snet"
+instance_name = 'inst'
 subnet = "10.2.0.0/24"
 grid_ip = "10.39.12.233"
 grid_master_name = "infoblox.localdomain"
@@ -180,5 +181,7 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=15)
     def test_deploy_instnace_host_name_pattern_host_ip_address(self):
 	proc = util.utils()
-	proc.launch_instance('inst',network)
-	
+	proc.launch_instance(instance_name,network)
+	instance = proc.get_server_name(instance_name)
+	assert instance_name == instance
+		
