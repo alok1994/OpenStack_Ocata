@@ -15,7 +15,7 @@ class utils:
             project_name='admin'
             project_domain_id='default'
             user_domain_id='default'
-            auth_url='http://10.39.12.231:5000/v3'
+            auth_url='http://10.39.12.121:5000/v3'
 	    VERSION = '2'
             auth = identity.Password(auth_url=auth_url,
                              username=username,
@@ -105,6 +105,14 @@ class utils:
               Return List of Servers
             """
             return self.nova_client.servers.list()
+
+	def get_servers_id(self):
+            """
+              Return List of Servers
+            """ 
+            instances = self.nova_client.servers.list()
+	    for instance in instances:
+	        return instance.id
 
     	def get_server(self, name):
             """
@@ -203,9 +211,9 @@ class utils:
             return name
 
     	def get_instance_ips(self, instance_name):
-            instance = self.nova_client.servers.find(name=instance_name) 
-            ips = self.nova_client.servers.ips(instance.id)
-            return ips
+            instance = self.nova_client.servers.find(name=instance_name)
+            ips_add = self.nova_client.servers.ips(instance.id)
+            return ips_add
 
     	def interface_attach(self, server, network):
             net_id = self.get_network_id(network)

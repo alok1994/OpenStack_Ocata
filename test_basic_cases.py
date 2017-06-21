@@ -194,6 +194,20 @@ class TestOpenStackCases(unittest.TestCase):
 	proc = util.utils()
 	ip_add = proc.get_instance_ips(instance_name)
 	ip_address = ip_add[network][0]['addr']
-	#ip_address = ref_v_a_record[0]['ipv4addr']
 	fqdn = "host-"+'-'.join(ip_address.split('.'))+'.'+zone_name
 	assert fqdn == a_record_name
+
+    @pytest.mark.run(order=17)
+    def test_validate_a_record_EAs(self):
+	a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+	ref_v = a_record[0]['_ref']
+	EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+	vm_name_nios = EAs['extattrs']['VM Name']['value']
+	vm_id_nios = EAs['extattrs']['VM ID']['value']
+	tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+	tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+	port_id_nios = EAs['extattrs']['Port ID']['value']
+	ip_type_nios = EAs['extattrs']['IP Type']['value']
+	proc = util.utils()
+	vm_id_openstack = proc.get_servers_id()
+
