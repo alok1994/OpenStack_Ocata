@@ -13,7 +13,7 @@ network = 'net1'
 subnet_name = "Snet"
 instance_name = 'inst'
 subnet = "10.2.0.0/24"
-grid_ip = "10.39.12.233"
+grid_ip = "10.39.12.121"
 grid_master_name = "infoblox.localdomain"
 
 
@@ -184,4 +184,16 @@ class TestOpenStackCases(unittest.TestCase):
 	proc.launch_instance(instance_name,network)
 	instance = proc.get_server_name(instance_name)
 	assert instance_name == instance
-		
+
+    @pytest.mark.run(order=16)
+    def test_validate_a_record_for_instance(self):
+	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+	zone_name = ref_v_zone[0]['fqdn']
+	ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+	a_record_name = ref_v_a_record[0]['name']
+	proc = util.utils()
+	ip_add = proc.get_instance_ips(instance_name)
+	ip_address = ip_add[network][0]['addr']
+	#ip_address = ref_v_a_record[0]['ipv4addr']
+	fqdn = "host-"+'-'.join(ip_address.split('.'))+'.'+zone_name
+	assert fqdn == a_record_name
