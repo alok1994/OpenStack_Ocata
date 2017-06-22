@@ -355,4 +355,20 @@ class TestOpenStackCases(unittest.TestCase):
             ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
 
         assert fixed_address_nios == ip_address_opstk
+
+    @pytest.mark.run(order=22)
+    def test_validate_mac_address_fixed_address_instance(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
+        ref = ref_v[0]['_ref']
+        mac_add = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=mac'))
+        mac_add_nios = mac_add['mac']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
+        else:
+            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+        assert mac_add_nios == mac_address_openstack
 	
