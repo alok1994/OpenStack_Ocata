@@ -326,4 +326,17 @@ class TestOpenStackCases(unittest.TestCase):
                cloud_api_owned == 'True' and \
                device_id_nios == device_id_openstack
 
+    @pytest.mark.run(order=21)
+    def test_validate_host_record_mac_address(self):
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+            mac_addrees_openstack = port_list_openstack['ports'][0]['mac_address']
+        else:
+            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+        assert mac_address_nios == mac_address_openstack
 	
