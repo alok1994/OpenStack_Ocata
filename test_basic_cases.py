@@ -22,21 +22,52 @@ class TestOpenStackCases(unittest.TestCase):
     def setup_class(cls):
 	pass
 
-    @pytest.mark.run(order=1)	
+    @pytest.mark.run(order=1)
+    def test_disable_DHCP_DNS_support(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "False"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "False"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{tenant_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{ip_address}"},\
+                "Default Network View": {"value": "default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r"infoblox.localdomain",proc)):
+            flag = True
+        assert proc != "" and flag
+
+    @pytest.mark.run(order=2)	
     def test_create_Network_OpenStack_Side(self):
         proc = util.utils()
         proc.create_network(network)
 	flag = proc.get_network(network)
 	assert flag == network
 
-    @pytest.mark.run(order=2)
+    @pytest.mark.run(order=3)
     def test_create_subnet_openstack_side(self):
 	proc = util.utils()
 	proc.create_subnet(network, subnet_name, subnet)
 	flag = proc.get_subnet_name(subnet_name)
 	assert flag == subnet_name
 
-    @pytest.mark.run(order=3)
+    @pytest.mark.run(order=4)
     def test_validate_network_on_NIOS(self):
 	flag = False	
 	proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
@@ -44,7 +75,7 @@ class TestOpenStackCases(unittest.TestCase):
 	    flag = True
 	assert flag, "Network creation failed "
 
-    @pytest.mark.run(order=4)
+    @pytest.mark.run(order=5)
     def test_validate_NIOS_EAs_Cloud_API_Owned_CMP_Type(self):
 	proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
 	resp = json.loads(proc)
@@ -52,7 +83,7 @@ class TestOpenStackCases(unittest.TestCase):
 	EAs = json.loads(wapi_module.wapi_request('GET',object_type = ref_v + '?_return_fields=extattrs'))
 	assert EAs['extattrs']['Cloud API Owned']['value'] == 'True' and EAs['extattrs']['CMP Type']['value'] == 'OpenStack'
 
-    @pytest.mark.run(order=5)
+    @pytest.mark.run(order=6)
     def test_Validate_NIOS_EAs_Network_Name_Network_ID_Subnet_Name_Subnet_ID(self):
         proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
 	session = util.utils()
@@ -69,7 +100,7 @@ class TestOpenStackCases(unittest.TestCase):
                EAs['extattrs']['Subnet ID']['value'] == Snet_ID and \
                EAs['extattrs']['Network Encap']['value'] == 'vxlan' 
 
-    @pytest.mark.run(order=6)
+    @pytest.mark.run(order=7)
     def test_validate_NIOS_EAs_Tenant_ID_Tenant_Name(self):
 	proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
         session = util.utils()
@@ -80,7 +111,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert EAs['extattrs']['Tenant ID']['value'] == tenant_id and \
 	       EAs['extattrs']['Tenant Name']['value'] == 'admin'
 
-    @pytest.mark.run(order=7)
+    @pytest.mark.run(order=8)
     def test_validate_NIOS_Router(self):
 	proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
 	resp = json.loads(proc)
@@ -93,13 +124,13 @@ class TestOpenStackCases(unittest.TestCase):
         route = str(ip.next())
 	assert route_nios == route
 
-    @pytest.mark.run(order=8)
+    @pytest.mark.run(order=9)
     def test_delete_net_subnet_openstack_side(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
 	assert delete_net == None
 
-    @pytest.mark.run(order=9)
+    @pytest.mark.run(order=10)
     def test_validate_delete_network_on_NIOS(self):
         flag = True
         proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
@@ -107,7 +138,7 @@ class TestOpenStackCases(unittest.TestCase):
             flag = False
         assert flag, "Network didn't remove from NIOS "
 
-    @pytest.mark.run(order=10)
+    @pytest.mark.run(order=11)
     def test_enable_DHCP_DNS_support_Default_Domain_Name_Pattern_TENENT_NAME_EAs(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
 	ref = ref_v[0]['_ref']
@@ -138,7 +169,7 @@ class TestOpenStackCases(unittest.TestCase):
             flag = True
         assert proc != "" and flag
 
-    @pytest.mark.run(order=11)
+    @pytest.mark.run(order=12)
     def test_create_network_DHCP_DNS_support_Domain_Name_TENANT_Name_openstack_side(self):
 	proc = util.utils()
         proc.create_network(network)
@@ -147,7 +178,7 @@ class TestOpenStackCases(unittest.TestCase):
 	flag = proc.get_subnet_name(subnet_name)
         assert flag == subnet_name
 
-    @pytest.mark.run(order=12)
+    @pytest.mark.run(order=13)
     def test_validate_member_assiged_network(self):
 	resp = json.loads(wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet))
 	ref_v = resp[0]['_ref']
@@ -155,13 +186,13 @@ class TestOpenStackCases(unittest.TestCase):
 	name = members['members'][0]['name']
 	assert grid_master_name == name, "Member has not been assign to Netwrok"
 	
-    @pytest.mark.run(order=13)
+    @pytest.mark.run(order=14)
     def test_validate_zone_name(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v[0]['fqdn']
 	assert tenant_name+'.cloud.global.com' == zone_name
 
-    @pytest.mark.run(order=14)
+    @pytest.mark.run(order=15)
     def test_validate_zone_EAs(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
         ref = ref_v[0]['_ref']
@@ -178,14 +209,15 @@ class TestOpenStackCases(unittest.TestCase):
 	       cloud_api_owned_nios == 'True'
 
 	# EAs 'Default Host Name Pattern': host-{ip_address}
-    @pytest.mark.run(order=15)
+    @pytest.mark.run(order=16)
     def test_deploy_instnace_host_name_pattern_host_ip_address(self):
 	proc = util.utils()
 	proc.launch_instance(instance_name,network)
-	instance = proc.get_server_name(instance_name)
-	assert instance_name == instance
+	instance = proc.get_server_name()
+        status = proc.get_server_status()
+	assert instance_name == instance and status == 'ACTIVE'
 
-    @pytest.mark.run(order=16)
+    @pytest.mark.run(order=17)
     def test_validate_a_record_for_instance(self):
 	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v_zone[0]['fqdn']
@@ -197,17 +229,45 @@ class TestOpenStackCases(unittest.TestCase):
 	fqdn = "host-"+'-'.join(ip_address.split('.'))+'.'+zone_name
 	assert fqdn == a_record_name
 
-    @pytest.mark.run(order=17)
+    @pytest.mark.run(order=18)
     def test_validate_a_record_EAs(self):
-	a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
-	ref_v = a_record[0]['_ref']
-	EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
-	vm_name_nios = EAs['extattrs']['VM Name']['value']
-	vm_id_nios = EAs['extattrs']['VM ID']['value']
-	tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
-	tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
-	port_id_nios = EAs['extattrs']['Port ID']['value']
-	ip_type_nios = EAs['extattrs']['IP Type']['value']
-	proc = util.utils()
-	vm_id_openstack = proc.get_servers_id()
+        a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+        ref_v = a_record[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        vm_name_nios = EAs['extattrs']['VM Name']['value']
+        vm_id_nios = EAs['extattrs']['VM ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        vm_id_openstack = proc.get_servers_id()
+        vm_name_openstack = proc.get_server_name()
+        vm_tenant_id_openstack = proc.get_server_tenant_id()
+        ip_adds = proc.get_instance_ips(instance_name)
+        inst_ip_address = ip_adds[network][0]['addr']
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            port_id_openstack = port_list_openstack['ports'][0]['id']
+            device_id_openstack = port_list_openstack['ports'][0]['device_id']
+        else:
+            port_id_openstack = port_list_openstack['ports'][1]['id']
+            device_id_openstack = port_list_openstack['ports'][1]['device_id']
+        assert vm_name_nios == vm_name_openstack and \
+               vm_id_nios == vm_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               tenant_id_nios == vm_tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_nios == device_owner_openstack and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'True' and \
+               device_id_nios == device_id_openstack
+
 

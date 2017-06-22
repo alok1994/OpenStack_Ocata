@@ -108,34 +108,34 @@ class utils:
 
 	def get_servers_id(self):
             """
-              Return List of Servers
+              Return server id
             """ 
             instances = self.nova_client.servers.list()
 	    for instance in instances:
 	        return instance.id
 
-    	def get_server(self, name):
-            """
-              Return Server Object for a given instance name
-            """
-            servers_list = self.get_servers_list()
-            server_exists = False
-            for s in servers_list:
-                if s.name == name:
-                    server_exists = True
-		    return name
-                    break
-            if not server_exists:
-                return None
-            else:
-                return s
+	def get_server_status(self):
+	    instances = self.nova_client.servers.list()
+            for instance in instances:
+                return instance.status
 
-	def get_server_name(self, name):
+	def get_server_name(self):
             """
               Return Server Object for a given instance name
             """
-            servers_list = self.get_server(name)
-	    return servers_list
+	    instances = self.nova_client.servers.list()
+            for instance in instances:
+                return instance.name
+
+        def get_server_tenant_id(self):
+            instances = self.nova_client.servers.list()
+            for instance in instances:
+                return instance.tenant_id
+	
+	def get_server_tenant_name(self):
+            instances = self.nova_client.servers.list()
+            for instance in instances:
+                return instance.tenant_name
 
 	def terminate_instance(self, name):
             """
@@ -146,6 +146,14 @@ class utils:
             if server:
                self.nova_client.servers.delete(server)
             time.sleep(60)
+
+	def list_ports(self, retrieve_all=True):
+            """
+               Fetches a list of all ports for a project.
+            """
+            # Pass filters in "params" argument to do_request
+            ports = self.neutron.list_ports()
+	    return ports
 
     	def create_router(self, router_name, network_name):
             net_id = self.get_network_id(network_name)
