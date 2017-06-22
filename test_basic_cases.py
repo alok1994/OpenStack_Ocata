@@ -256,18 +256,37 @@ class TestOpenStackCases(unittest.TestCase):
         if device_owner_openstack == 'compute:None':
             port_id_openstack = port_list_openstack['ports'][0]['id']
             device_id_openstack = port_list_openstack['ports'][0]['device_id']
+	    device_owner_opstk = 'compute:None'
         else:
             port_id_openstack = port_list_openstack['ports'][1]['id']
             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	    device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
                tenant_id_nios == vm_tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
                ip_type_nios == 'Fixed' and \
-               device_owner_nios == device_owner_openstack and \
+               device_owner_opstk == device_owner_openstack and \
                cmp_type_nios == 'OpenStack' and \
                cloud_api_owned == 'True' and \
                device_id_nios == device_id_openstack
 
+    @pytest.mark.run(order=19)
+    def test_validate_host_record_entry(self):
+	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        host_record_name = host_records[0]['name']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
+        else:
+            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
 
+        host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
+        assert host_record_name == host_record_openstack
+	
