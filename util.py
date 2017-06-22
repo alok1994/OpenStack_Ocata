@@ -137,14 +137,14 @@ class utils:
             for instance in instances:
                 return instance.tenant_name
 
-	def terminate_instance(self, name):
+	def terminate_instance(self):
             """
               Terminates an instance
               It takes Instance Name as argument.
             """
-            server = self.get_server(name)
-            if server:
-               self.nova_client.servers.delete(server)
+            server = self.get_servers_id()
+            #if server:
+            self.nova_client.servers.delete(server)
             time.sleep(60)
 
 	def list_ports(self, retrieve_all=True):
