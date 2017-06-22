@@ -356,7 +356,7 @@ class TestOpenStackCases(unittest.TestCase):
 
         assert fixed_address_nios == ip_address_opstk
 
-    @pytest.mark.run(order=22)
+    @pytest.mark.run(order=23)
     def test_validate_mac_address_fixed_address_instance(self):
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
         ref = ref_v[0]['_ref']
