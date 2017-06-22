@@ -371,4 +371,47 @@ class TestOpenStackCases(unittest.TestCase):
         else:
             mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
         assert mac_add_nios == mac_address_openstack
+
+    @pytest.mark.run(order=24)
+    def test_validate_fixed_address_EAs(self):
+        fixed_add = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
+        ref_v = fixed_add[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        vm_name_nios = EAs['extattrs']['VM Name']['value']
+        vm_id_nios = EAs['extattrs']['VM ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        vm_id_openstack = proc.get_servers_id()
+        vm_name_openstack = proc.get_server_name()
+        vm_tenant_id_openstack = proc.get_server_tenant_id()
+        ip_adds = proc.get_instance_ips(instance_name)
+        inst_ip_address = ip_adds[network][0]['addr']
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            port_id_openstack = port_list_openstack['ports'][0]['id']
+            device_id_openstack = port_list_openstack['ports'][0]['device_id']
+            device_owner_opstk = 'compute:None'
+        else:
+            port_id_openstack = port_list_openstack['ports'][1]['id']
+            device_id_openstack = port_list_openstack['ports'][1]['device_id']
+            device_owner_opstk = 'compute:None'
+        assert vm_name_nios == vm_name_openstack and \
+               vm_id_nios == vm_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               tenant_id_nios == vm_tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_opstk == device_owner_nios and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'True' and \
+               device_id_nios == device_id_openstack
 	
