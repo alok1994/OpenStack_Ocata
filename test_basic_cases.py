@@ -267,7 +267,7 @@ class TestOpenStackCases(unittest.TestCase):
                tenant_id_nios == vm_tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
                ip_type_nios == 'Fixed' and \
-               device_owner_opstk == device_owner_openstack and \
+               device_owner_opstk == device_owner_nios and \
                cmp_type_nios == 'OpenStack' and \
                cloud_api_owned == 'True' and \
                device_id_nios == device_id_openstack
@@ -289,4 +289,41 @@ class TestOpenStackCases(unittest.TestCase):
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
+
+    @pytest.mark.run(order=20)
+    def test_validate_host_record_EAs(self):
+	host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        ref_v = host_records[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+             port_id_openstack = port_list_openstack['ports'][0]['id']
+             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
+             device_id_openstack = port_list_openstack['ports'][0]['device_id']
+             device_owner_opstk = 'network:dhcp'
+        else:
+             port_id_openstack = port_list_openstack['ports'][1]['id']
+             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
+             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+             device_owner_opstk = 'network:dhcp'
+        assert tenant_id_nios == tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_nios == device_owner_opstk and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'True' and \
+               device_id_nios == device_id_openstack
+
 	
