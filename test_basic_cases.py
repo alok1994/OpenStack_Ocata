@@ -23,7 +23,7 @@ class TestOpenStackCases(unittest.TestCase):
 	pass
 
     @pytest.mark.run(order=1)
-    def test_disable_DHCP_DNS_support(self):
+    def test_EAs_disable_DHCPSupport_and_DNSSupport(self):
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
         ref = ref_v[0]['_ref']
         data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
@@ -54,21 +54,21 @@ class TestOpenStackCases(unittest.TestCase):
         assert proc != "" and flag
 
     @pytest.mark.run(order=2)	
-    def test_create_Network_OpenStack_Side(self):
+    def test_create_Network_disable_EAs_DHCPSupport_and_DNSSupport(self):
         proc = util.utils()
         proc.create_network(network)
 	flag = proc.get_network(network)
 	assert flag == network
 
     @pytest.mark.run(order=3)
-    def test_create_subnet_openstack_side(self):
+    def test_create_subnet_disable_EAs_DHCPSupport_and_DNSSupport(self):
 	proc = util.utils()
 	proc.create_subnet(network, subnet_name, subnet)
 	flag = proc.get_subnet_name(subnet_name)
 	assert flag == subnet_name
 
     @pytest.mark.run(order=4)
-    def test_validate_network_on_NIOS(self):
+    def test_validate_network_disable_EAs_DHCPSupport_and_DNSSupport(self):
 	flag = False	
 	proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
 	if (re.search(r""+subnet,proc)):
@@ -125,13 +125,13 @@ class TestOpenStackCases(unittest.TestCase):
 	assert route_nios == route
 
     @pytest.mark.run(order=9)
-    def test_delete_net_subnet_openstack_side(self):
+    def test_delete_net_subnet_disable_EAs_DHCPSupport_and_DNSSupport(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
 	assert delete_net == None
 
     @pytest.mark.run(order=10)
-    def test_validate_delete_network_on_NIOS(self):
+    def test_validate_delete_network_disable_EAs_DHCPSupport_and_DNSSupport(self):
         flag = True
         proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
         if (re.search(r""+subnet,proc)):
@@ -139,7 +139,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert flag, "Network didn't remove from NIOS "
 
     @pytest.mark.run(order=11)
-    def test_enable_DHCP_DNS_support_Default_Domain_Name_Pattern_TENENT_NAME_EAs(self):
+    def test_select_enable_DHCPSupport_DNSSupport_DomainNamePattern_as_TenantName_EAs(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
 	ref = ref_v[0]['_ref']
 	data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
@@ -170,7 +170,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert proc != "" and flag
 
     @pytest.mark.run(order=12)
-    def test_create_network_DHCP_DNS_support_Domain_Name_TENANT_Name_openstack_side(self):
+    def test_create_network_DHCPSupport_DNSSupport_DomainNamePattern_as_TenantName_EAs(self):
 	proc = util.utils()
         proc.create_network(network)
 	proc.create_subnet(network, subnet_name, subnet)
@@ -179,7 +179,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert flag == subnet_name
 
     @pytest.mark.run(order=13)
-    def test_validate_member_assiged_network(self):
+    def test_validate_member_assiged_network_DHCPSupport_DNSSupport_DomainNamePattern_as_TenantName_EAs(self):
 	resp = json.loads(wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet))
 	ref_v = resp[0]['_ref']
 	members = json.loads(wapi_module.wapi_request('GET',object_type = ref_v+'?_return_fields=members'))
@@ -187,13 +187,13 @@ class TestOpenStackCases(unittest.TestCase):
 	assert grid_master_name == name, "Member has not been assign to Netwrok"
 	
     @pytest.mark.run(order=14)
-    def test_validate_zone_name(self):
+    def test_validate_zone_name_DomainNamePattern_as_TenantName_EAs(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v[0]['fqdn']
 	assert tenant_name+'.cloud.global.com' == zone_name
 
     @pytest.mark.run(order=15)
-    def test_validate_zone_EAs(self):
+    def test_validate_zone_EAs_DomainNamePattern_as_TenantName(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
         ref = ref_v[0]['_ref']
 	EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=extattrs'))
@@ -210,7 +210,7 @@ class TestOpenStackCases(unittest.TestCase):
 
 	# EAs 'Default Host Name Pattern': host-{ip_address}
     @pytest.mark.run(order=16)
-    def test_deploy_instnace_host_name_pattern_host_ip_address(self):
+    def test_deploy_instnace_HostNamePattern_as_HostIPAddress(self):
 	proc = util.utils()
 	proc.launch_instance(instance_name,network)
 	instance = proc.get_server_name()
@@ -218,7 +218,7 @@ class TestOpenStackCases(unittest.TestCase):
 	assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=17)
-    def test_validate_a_record_for_instance(self):
+    def test_validate_a_record_HostNamePattern_as_HostIPAddress(self):
 	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v_zone[0]['fqdn']
 	ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
@@ -230,7 +230,7 @@ class TestOpenStackCases(unittest.TestCase):
 	assert fqdn == a_record_name
 
     @pytest.mark.run(order=18)
-    def test_validate_a_record_EAs(self):
+    def test_validate_a_record_EAs_HostNamePattern_as_HostIPAddress(self):
         a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
         ref_v = a_record[0]['_ref']
         EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
@@ -327,7 +327,7 @@ class TestOpenStackCases(unittest.TestCase):
                device_id_nios == device_id_openstack
 
     @pytest.mark.run(order=21)
-    def test_validate_host_record_mac_address(self):
+    def test_validate_host_record_entry_mac_address(self):
         host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
@@ -342,7 +342,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert mac_address_nios == mac_address_openstack
 
     @pytest.mark.run(order=22)
-    def test_validate_fixed_address_instance(self):
+    def test_validate_fixed_address_HostNamePattern_as_HostIPAddress(self):
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
@@ -357,7 +357,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert fixed_address_nios == ip_address_opstk
 
     @pytest.mark.run(order=23)
-    def test_validate_mac_address_fixed_address_instance(self):
+    def test_validate_mac_address_fixed_address_instance_HostNamePattern_as_HostIPAddress(self):
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
         ref = ref_v[0]['_ref']
         mac_add = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=mac'))
@@ -373,7 +373,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=24)
-    def test_validate_fixed_address_EAs(self):
+    def test_validate_fixed_address_EAs_HostNamePattern_as_HostIPAddress(self):
         fixed_add = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
         ref_v = fixed_add[0]['_ref']
         EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
@@ -416,13 +416,13 @@ class TestOpenStackCases(unittest.TestCase):
                device_id_nios == device_id_openstack
 
     @pytest.mark.run(order=25)
-    def test_terminate_instance1(self):
+    def test_terminate_instance_HostNamePattern_as_HostIPAddress(self):
         proc = util.utils()
         server = proc.terminate_instance()
         assert server == None
 
     @pytest.mark.run(order=26)
-    def test_delete_net_subnet_openstack_side_Default_Host_Name_Pattern(self):
+    def test_delete_net_subnet_HostNamePattern_as_HostIPAddress(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
 	assert delete_net == None	
