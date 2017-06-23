@@ -430,7 +430,7 @@ class TestOpenStackCases(unittest.TestCase):
        # Default Domain Name Pattern : {network_name}.cloud.global.com
        # Default Host Name Pattern : host-{subnet_name}-{ip_address}
     @pytest.mark.run(order=27)
-    def test_network_name_subnet_name_domain_host_name_pattern(self):
+    def test_EAs_SubnetName_as_HostName_pattern_and_NetworkName_as_DomainName_pattern(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
 	ref = ref_v[0]['_ref']
 	data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
@@ -461,7 +461,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert proc != "" and flag
 
     @pytest.mark.run(order=28)
-    def test_create_network_with_network_name_domain_name_pattern_openstack_side(self):
+    def test_create_network_NetworkName_as_DomainName_Pattern_openstack_side(self):
 	proc = util.utils()
         proc.create_network(network)
 	proc.create_subnet(network, subnet_name, subnet)
@@ -470,13 +470,13 @@ class TestOpenStackCases(unittest.TestCase):
         assert flag == subnet_name
 
     @pytest.mark.run(order=29)
-    def test_validate_zone_name_as_pattern_network_name(self):
+    def test_validate_zone_name_NetworkName_as_DomainName_pattern(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v[0]['fqdn']
 	assert network+'.cloud.global.com' == zone_name
 
     @pytest.mark.run(order=30)
-    def test_deploy_instnace_to_validate_host_name_pattern_subnet_name(self):
+    def test_deploy_instance_SubnetName_as_HostName_Pattern(self):
 	proc = util.utils()
 	proc.launch_instance(instance_name,network)
 	instance = proc.get_server_name()
@@ -484,7 +484,7 @@ class TestOpenStackCases(unittest.TestCase):
 	assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=31)
-    def test_validate_a_record_pattern_as_subnet_name(self):
+    def test_validate_A_Record_SubnetName_as_HostName_Pattern(self):
 	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v_zone[0]['fqdn']
 	ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
@@ -495,3 +495,14 @@ class TestOpenStackCases(unittest.TestCase):
 	fqdn = "host-"+subnet_name+'-'+'-'.join(ip_address.split('.'))+'.'+zone_name
 	assert fqdn == a_record_name
 
+    @pytest.mark.run(order=32)
+    def test_terminate_instance_used_SubnetName_as__HostName_pattern(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
+
+    @pytest.mark.run(order=33)
+    def test_delete_subnet_used_NetworkName_as_DomainName_pattern(self):
+        session = util.utils()
+	delete_net = session.delete_network(network)
+	assert delete_net == None
