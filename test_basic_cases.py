@@ -587,3 +587,76 @@ class TestOpenStackCases(unittest.TestCase):
         session = util.utils()
 	delete_net = session.delete_network(network)
 	assert delete_net == None
+
+    #"Default Domain Name Pattern":"{subnet_name}.cloud.global.com"
+    #"Default Host Name Pattern": "host-{network_name}-{ip_address}"
+    @pytest.mark.run(order=41)
+    def test_EAs_SubnetName_as_DomainNamePattern_and_NetworkName_as_HostNamePattern(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{subnet_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{network_name}-{ip_address}"},\
+                "Default Network View": {"value": "default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+
+    @pytest.mark.run(order=42)
+    def test_create_network_SubnetName_as_DomainNamePattern_and_NetworkName_as_HostNamePattern(self):
+        proc = util.utils()
+        proc.create_network(network)
+        proc.create_subnet(network, subnet_name, subnet)
+        flag = proc.get_subnet_name(subnet_name)
+        flag = proc.get_subnet_name(subnet_name)
+        assert flag == subnet_name
+
+    @pytest.mark.run(order=43)
+    def test_validate_zone_name_as_SubnetName_DomainNamePattern(self):
+        proc = util.utils()
+        name_subnet = proc.get_subnet_name(subnet_name)
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v[0]['fqdn']
+        assert name_subnet+'.cloud.global.com' == zone_name
+
+    @pytest.mark.run(order=44)
+    def test_deploy_instance_NetworkName_as_HostNamePattern(self):
+        proc = util.utils()
+        proc.launch_instance(instance_name,network)
+        instance = proc.get_server_name()
+        status = proc.get_server_status()
+        assert instance_name == instance and status == 'ACTIVE'
+
+    @pytest.mark.run(order=45)
+    def test_validate_a_record_NetworkName_as_HostNamePattern(self):
+        ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+        ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+        a_record_name = ref_v_a_record[0]['name']
+        proc = util.utils()
+        ip_add = proc.get_instance_ips(instance_name)
+        ip_address = ip_add[network][0]['addr']
+        network_name = proc.get_network(network)
+        fqdn = "host-"+network_name+'-'+'-'.join(ip_address.split('.'))+'.'+zone_name
+        assert fqdn == a_record_name
+
+
