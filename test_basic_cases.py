@@ -49,7 +49,7 @@ class TestOpenStackCases(unittest.TestCase):
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
         proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
         flag = False
-        if (re.search(r"infoblox.localdomain",proc)):
+        if (re.search(r""+grid_master_name,proc)):
             flag = True
         assert proc != "" and flag
 
@@ -165,7 +165,7 @@ class TestOpenStackCases(unittest.TestCase):
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}} 
 	proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
 	flag = False
-        if (re.search(r"infoblox.localdomain",proc)):
+        if (re.search(r""+grid_master_name,proc)):
             flag = True
         assert proc != "" and flag
 
@@ -420,4 +420,42 @@ class TestOpenStackCases(unittest.TestCase):
         proc = util.utils()
         server = proc.terminate_instance()
         assert server == None
-	
+
+    @pytest.mark.run(order=26)
+    def test_delete_net_subnet_openstack_side_Default_Host_Name_Pattern(self):
+        session = util.utils()
+	delete_net = session.delete_network(network)
+	assert delete_net == None	
+
+       # Default Domain Name Pattern : {network_name}.cloud.global.com
+       # Default Host Name Pattern : host-{subnet_name}-{ip_address}
+    @pytest.mark.run(order=27)
+    def test_network_name_subnet_name_domain_host_name_pattern(self):
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+	ref = ref_v[0]['_ref']
+	data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{network_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{subnet_name}-{ip_address}"},\
+                "Default Network View": {"value": "default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}} 
+	proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+	flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
