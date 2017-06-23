@@ -143,9 +143,13 @@ class utils:
               It takes Instance Name as argument.
             """
             server = self.get_servers_id()
-            #if server:
-            self.nova_client.servers.delete(server)
-            time.sleep(60)
+            if server:
+                self.nova_client.servers.delete(server)
+                time.sleep(60)
+		return None
+	    else:
+		server = self.get_servers_id()
+		return server
 
 	def list_ports(self, retrieve_all=True):
             """

@@ -414,4 +414,10 @@ class TestOpenStackCases(unittest.TestCase):
                cmp_type_nios == 'OpenStack' and \
                cloud_api_owned == 'True' and \
                device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=25)
+    def test_terminate_instance1(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
 	
