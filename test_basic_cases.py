@@ -740,4 +740,14 @@ class TestOpenStackCases(unittest.TestCase):
         fqdn = "host-"+network_id+'-'+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert fqdn == a_record_name
 
+    @pytest.mark.run(order=53)
+    def test_terminate_instance_used_SubnetID_as_DomainNamePattern_and_NetworkID_as_HostNamePattern(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
 
+    @pytest.mark.run(order=54)
+    def test_delete_subnet_used_SubnetID_as_DomainNamePattern(self):
+        session = util.utils()
+	delete_net = session.delete_network(network)
+	assert delete_net == None
