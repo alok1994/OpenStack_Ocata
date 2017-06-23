@@ -10,7 +10,7 @@ from netaddr import IPNetwork
 
 tenant_name = 'admin'
 network = 'net1'
-subnet_name = "Snet"
+subnet_name = "snet"
 instance_name = 'inst'
 subnet = "10.2.0.0/24"
 grid_ip = "10.39.12.121"
@@ -459,3 +459,39 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+grid_master_name,proc)):
             flag = True
         assert proc != "" and flag
+
+    @pytest.mark.run(order=28)
+    def test_create_network_with_network_name_domain_name_pattern_openstack_side(self):
+	proc = util.utils()
+        proc.create_network(network)
+	proc.create_subnet(network, subnet_name, subnet)
+        flag = proc.get_subnet_name(subnet_name)
+	flag = proc.get_subnet_name(subnet_name)
+        assert flag == subnet_name
+
+    @pytest.mark.run(order=29)
+    def test_validate_zone_name_as_pattern_network_name(self):
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+	zone_name = ref_v[0]['fqdn']
+	assert network+'.cloud.global.com' == zone_name
+
+    @pytest.mark.run(order=30)
+    def test_deploy_instnace_to_validate_host_name_pattern_subnet_name(self):
+	proc = util.utils()
+	proc.launch_instance(instance_name,network)
+	instance = proc.get_server_name()
+        status = proc.get_server_status()
+	assert instance_name == instance and status == 'ACTIVE'
+
+    @pytest.mark.run(order=31)
+    def test_validate_a_record_pattern_as_subnet_name(self):
+	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+	zone_name = ref_v_zone[0]['fqdn']
+	ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+	a_record_name = ref_v_a_record[0]['name']
+	proc = util.utils()
+	ip_add = proc.get_instance_ips(instance_name)
+	ip_address = ip_add[network][0]['addr']
+	fqdn = "host-"+subnet_name+'-'+'-'.join(ip_address.split('.'))+'.'+zone_name
+	assert fqdn == a_record_name
+
