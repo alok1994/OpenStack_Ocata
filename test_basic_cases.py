@@ -15,7 +15,7 @@ instance_name = 'inst'
 subnet = "10.2.0.0/24"
 grid_ip = "10.39.12.121"
 grid_master_name = "infoblox.localdomain"
-
+custom_net_view = "openstack_view"
 
 class TestOpenStackCases(unittest.TestCase):
     @classmethod
@@ -42,9 +42,9 @@ class TestOpenStackCases(unittest.TestCase):
                 "Grid Sync Maximum Wait Time": {"value": 10},\
                 "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
                 "IP Allocation Strategy": {"value": "Fixed Address"},\
-                "Relay Support": {"value": "False"},\
+                "Relay Support": {"value": "True"},\
                 "Report Grid Sync Time": {"value": "True"},\
-                "Tenant Name Persistence": {"value": "False"},\
+                "Tenant Name Persistence": {"value": "True"},\
                 "Use Grid Master for DHCP": {"value": "True"},\
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
         proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
@@ -158,9 +158,9 @@ class TestOpenStackCases(unittest.TestCase):
                 "Grid Sync Maximum Wait Time": {"value": 10},\
                 "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
                 "IP Allocation Strategy": {"value": "Fixed Address"},\
-                "Relay Support": {"value": "False"},\
+                "Relay Support": {"value": "True"},\
                 "Report Grid Sync Time": {"value": "True"},\
-                "Tenant Name Persistence": {"value": "False"},\
+                "Tenant Name Persistence": {"value": "True"},\
                 "Use Grid Master for DHCP": {"value": "True"},\
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}} 
 	proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
@@ -228,7 +228,7 @@ class TestOpenStackCases(unittest.TestCase):
 	ip_address = ip_add[network][0]['addr']
 	fqdn = "host-"+'-'.join(ip_address.split('.'))+'.'+zone_name
 	assert fqdn == a_record_name
-
+'''
     @pytest.mark.run(order=18)
     def test_validate_a_record_EAs_HostNamePattern_as_HostIPAddress(self):
         a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
@@ -751,3 +751,84 @@ class TestOpenStackCases(unittest.TestCase):
         session = util.utils()
 	delete_net = session.delete_network(network)
 	assert delete_net == None
+
+    @pytest.mark.run(order=55)
+    def test_add_custom_network_view(self):
+        data = {"name":custom_net_view,"extattrs": {"CMP Type":{"value":"OpenStack"},\
+                "Cloud API Owned": {"value":"True"},"Cloud Adapter ID":{"value":"1"},\
+                "Tenant ID":{"value":"N/A"}}}
+        proc = wapi_module.wapi_request('POST',object_type='networkview',fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+custom_net_view,proc)):
+            flag = True
+        assert proc != "" and flag
+        time.sleep(5)
+
+    @pytest.mark.run(order=56)
+    def test_CustomNetworkView_as_DefaultNetworkView_EA(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{tenant_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{ip_address}"},\
+                "Default Network View": {"value":custom_net_view},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+
+    @pytest.mark.run(order=57)
+    def test_create_network_CustomNetworkView_as_DefaultNetworkView_EA(self):
+        proc = util.utils()
+        proc.create_network(network)
+        proc.create_subnet(network, subnet_name, subnet)
+        flag = proc.get_subnet_name(subnet_name)
+        flag = proc.get_subnet_name(subnet_name)
+        assert flag == subnet_name
+
+    @pytest.mark.run(order=58)
+    def test_validate_network_in_CustomNetworkView(self):
+        networks = json.loads(wapi_module.wapi_request('GET',object_type='network'))
+        network_nios = networks[0]['network']
+        network_view = networks[0]['network_view']
+        assert network_nios == subnet and \
+               network_view == custom_net_view
+
+    @pytest.mark.run(order=59)
+    def test_validate_network_EAs_CustomNetworkView(self):
+        session = util.utils()
+        net_name = session.get_network(network)
+        net_id = session.get_network_id(network)
+        sub_name = session.get_subnet_name(subnet_name)
+        snet_ID = session.get_subnet_id(subnet_name)
+        tenant_id = session.get_tenant_id(network)
+        proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
+        resp = json.loads(proc)
+        ref_v = resp[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type = ref_v + '?_return_fields=extattrs'))
+        assert EAs['extattrs']['Network Name']['value'] == net_name and \
+               EAs['extattrs']['Network ID']['value'] == net_id and \
+               EAs['extattrs']['Subnet Name']['value'] == sub_name and \
+               EAs['extattrs']['Subnet ID']['value'] == snet_ID and \
+               EAs['extattrs']['Network Encap']['value'] == 'vxlan' and \
+               EAs['extattrs']['Cloud API Owned']['value'] == 'True' and \
+               EAs['extattrs']['Tenant Name']['value'] == tenant_name
+'''

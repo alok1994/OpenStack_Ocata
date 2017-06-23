@@ -97,7 +97,7 @@ class utils:
 	    nic_id = [{'net-id': net_id}]
             instance = self.nova_client.servers.create(name=name, image=image,\
                                                        flavor=flavor, nics=nic_id)
-            time.sleep(30)
+            time.sleep(60)
             #return instance
 
         def get_servers_list(self):
@@ -145,7 +145,7 @@ class utils:
             server = self.get_servers_id()
             if server:
                 self.nova_client.servers.delete(server)
-                time.sleep(30)
+                time.sleep(60)
 		return None
 	    else:
 		server = self.get_servers_id()
