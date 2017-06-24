@@ -832,3 +832,254 @@ class TestOpenStackCases(unittest.TestCase):
                EAs['extattrs']['Cloud API Owned']['value'] == 'True' and \
                EAs['extattrs']['Tenant Name']['value'] == tenant_name
 
+    @pytest.mark.run(order=60)
+    def test_validate_zone_in_custom_network_view(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v[0]['fqdn']
+        network_view = ref_v[0]['view']
+        assert zone_name == tenant_name+'.cloud.global.com' and \
+               network_view == 'default.'+custom_net_view
+
+    @pytest.mark.run(order=61)
+    def test_validate_zone_EAs_in_CustomNetworkView(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        ref = ref_v[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=extattrs'))
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned_nios = EAs['extattrs']['Cloud API Owned']['value']
+        session = util.utils()
+        tenant_id_openstack = session.get_tenant_id(network)
+        assert tenant_id_openstack == tenant_id_nios and \
+               tenant_name_nios == tenant_name and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned_nios == 'True'
+
+    @pytest.mark.run(order=62)
+    def test_deploy_instnace_CustomNetworkView(self):
+        proc = util.utils()
+        proc.launch_instance(instance_name,network)
+        instance = proc.get_server_name()
+        status = proc.get_server_status()
+        assert instance_name == instance and status == 'ACTIVE'
+
+    @pytest.mark.run(order=63)
+    def test_validate_a_record_in_CustomNetwork_View(self):
+        ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+        ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+        a_record_name = ref_v_a_record[0]['name']
+        proc = util.utils()
+        ip_add = proc.get_instance_ips(instance_name)
+        ip_address = ip_add[network][0]['addr']
+        fqdn = "host-"+'-'.join(ip_address.split('.'))+'.'+zone_name
+        assert fqdn == a_record_name
+
+    @pytest.mark.run(order=64)
+    def test_validate_a_record_EAs_in_CustomNetworkView(self):
+        a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+        ref_v = a_record[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        vm_name_nios = EAs['extattrs']['VM Name']['value']
+        vm_id_nios = EAs['extattrs']['VM ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        vm_id_openstack = proc.get_servers_id()
+        vm_name_openstack = proc.get_server_name()
+        vm_tenant_id_openstack = proc.get_server_tenant_id()
+        ip_adds = proc.get_instance_ips(instance_name)
+        inst_ip_address = ip_adds[network][0]['addr']
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            port_id_openstack = port_list_openstack['ports'][0]['id']
+            device_id_openstack = port_list_openstack['ports'][0]['device_id']
+            device_owner_opstk = 'compute:None'
+        else:
+            port_id_openstack = port_list_openstack['ports'][1]['id']
+            device_id_openstack = port_list_openstack['ports'][1]['device_id']
+            device_owner_opstk = 'compute:None'
+        assert vm_name_nios == vm_name_openstack and \
+               vm_id_nios == vm_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               tenant_id_nios == vm_tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_opstk == device_owner_nios and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'True' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=65)
+    def test_validate_host_record_entry_in_CustomNetworkView(self):
+        ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        host_record_name = host_records[0]['name']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
+        else:
+            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+
+        host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
+        assert host_record_name == host_record_openstack
+
+    @pytest.mark.run(order=66)
+    def test_validate_host_record_EAs_in_CustomNetworkView(self):
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        ref_v = host_records[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+             port_id_openstack = port_list_openstack['ports'][0]['id']
+             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
+             device_id_openstack = port_list_openstack['ports'][0]['device_id']
+             device_owner_opstk = 'network:dhcp'
+        else:
+             port_id_openstack = port_list_openstack['ports'][1]['id']
+             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
+             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+             device_owner_opstk = 'network:dhcp'
+        assert tenant_id_nios == tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_nios == device_owner_opstk and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'True' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=67)
+    def test_validate_host_record_entry_mac_address_in_CustomNetworkView(self):
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
+        else:
+            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+        assert mac_address_nios == mac_address_openstack
+
+    @pytest.mark.run(order=68)
+    def test_validate_fixed_address_in_CustomNetworkView(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
+        fixed_address_nios = ref_v[0]['ipv4addr']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
+        else:
+            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+        assert fixed_address_nios == ip_address_opstk
+
+    @pytest.mark.run(order=69)
+    def test_validate_mac_address_fixed_address_in_CustomNetworkView(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
+        ref = ref_v[0]['_ref']
+        mac_add = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=mac'))
+        mac_add_nios = mac_add['mac']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
+        else:
+            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+        assert mac_add_nios == mac_address_openstack
+
+    @pytest.mark.run(order=70)
+    def test_validate_fixed_address_EAs_in_CustomNetworkView(self):
+        fixed_add = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
+        ref_v = fixed_add[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        vm_name_nios = EAs['extattrs']['VM Name']['value']
+        vm_id_nios = EAs['extattrs']['VM ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        vm_id_openstack = proc.get_servers_id()
+        vm_name_openstack = proc.get_server_name()
+        vm_tenant_id_openstack = proc.get_server_tenant_id()
+        ip_adds = proc.get_instance_ips(instance_name)
+        inst_ip_address = ip_adds[network][0]['addr']
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            port_id_openstack = port_list_openstack['ports'][0]['id']
+            device_id_openstack = port_list_openstack['ports'][0]['device_id']
+            device_owner_opstk = 'compute:None'
+        else:
+            port_id_openstack = port_list_openstack['ports'][1]['id']
+            device_id_openstack = port_list_openstack['ports'][1]['device_id']
+            device_owner_opstk = 'compute:None'
+        assert vm_name_nios == vm_name_openstack and \
+               vm_id_nios == vm_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               tenant_id_nios == vm_tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_opstk == device_owner_nios and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'True' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=71)
+    def test_terminate_instance_CustomNetworkView(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
+
+    @pytest.mark.run(order=72)
+    def test_delete_net_subnet_CustomNetworkView(self):
+        session = util.utils()
+        delete_net = session.delete_network(network)
+        assert delete_net == None
+
+    @pytest.mark.run(order=73)
+    def test_delete_CustomNetworkView(self):
+        proc = wapi_module.wapi_request('GET',object_type='networkview',params='?name='+custom_net_view)
+        response = json.loads(proc)
+        ref_v = response[0]['_ref']
+        delete = wapi_module.wapi_request('DELETE',object_type=ref_v)
+        flag = False
+        if (re.search(r''+custom_net_view,delete)):
+            flag = True
+        assert delete != '',flag
+
