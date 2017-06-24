@@ -228,7 +228,7 @@ class TestOpenStackCases(unittest.TestCase):
 	ip_address = ip_add[network][0]['addr']
 	fqdn = "host-"+'-'.join(ip_address.split('.'))+'.'+zone_name
 	assert fqdn == a_record_name
-'''
+
     @pytest.mark.run(order=18)
     def test_validate_a_record_EAs_HostNamePattern_as_HostIPAddress(self):
         a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
@@ -831,4 +831,4 @@ class TestOpenStackCases(unittest.TestCase):
                EAs['extattrs']['Network Encap']['value'] == 'vxlan' and \
                EAs['extattrs']['Cloud API Owned']['value'] == 'True' and \
                EAs['extattrs']['Tenant Name']['value'] == tenant_name
-'''
+

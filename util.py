@@ -92,12 +92,12 @@ class utils:
               It takes Instance Name and the Network Name it should be associated with as arguments.
             """
             image = self.nova_client.images.find(name="cirros-0.3.4-x86_64-uec")
-            flavor = self.nova_client.flavors.find(name="m1.tiny")
+            flavor = self.nova_client.flavors.find(name="m1.nano")
             net_id  = self.get_network_id(net_name)
 	    nic_id = [{'net-id': net_id}]
             instance = self.nova_client.servers.create(name=name, image=image,\
                                                        flavor=flavor, nics=nic_id)
-            time.sleep(60)
+            time.sleep(30)
             #return instance
 
         def get_servers_list(self):
@@ -145,7 +145,7 @@ class utils:
             server = self.get_servers_id()
             if server:
                 self.nova_client.servers.delete(server)
-                time.sleep(60)
+                time.sleep(30)
 		return None
 	    else:
 		server = self.get_servers_id()
