@@ -4,6 +4,7 @@ from neutronclient.v2_0 import client
 import os,sys
 from novaclient.client import Client
 import time
+#import create_address_scope
 #os.system('export OS_USERNAME=admin')
 #os.system('export OS_PASSWORD=admin')
 #os.system('export OS_TENANT_NAME=admin')
@@ -97,7 +98,7 @@ class utils:
 	    nic_id = [{'net-id': net_id}]
             instance = self.nova_client.servers.create(name=name, image=image,\
                                                        flavor=flavor, nics=nic_id)
-            time.sleep(30)
+            time.sleep(60)
             #return instance
 
         def get_servers_list(self):
@@ -145,7 +146,7 @@ class utils:
             server = self.get_servers_id()
             if server:
                 self.nova_client.servers.delete(server)
-                time.sleep(30)
+                time.sleep(60)
 		return None
 	    else:
 		server = self.get_servers_id()
@@ -234,3 +235,30 @@ class utils:
 
     	def interface_detach(self, server, port_id):
             self.nova_client.servers.interface_detach(server=server, port_id=port_id) 
+
+        def list_address_scopes(self, retrieve_all=True, **_params):
+            """Fetches a list of all address scopes for a project."""
+            return self.list('address_scopes', self.address_scopes_path,
+                         retrieve_all, **_params)
+
+        def show_address_scope(self, address_scope, **_params):
+            """Fetches information of a certain address scope."""
+            return self.get(self.address_scope_path % (address_scope),
+                        params=_params)
+
+        def create_address_scope(self, body=None):
+            """Creates a new address scope."""
+	    import pdb
+	    pdb.set_trace()
+	    body_create = {'address_scope': [{'name': 'addressScope','shared':'address-scope-ip4','ip_version':4}]}
+	    addressScope = self.neutron.create_address_scope(body=body_create)
+	    return addressScope
+            #return self.post(self.address_scopes_path, body=body)
+
+        def update_address_scope(self, address_scope, body=None):
+            """Updates a address scope."""
+            return self.put(self.address_scope_path % (address_scope), body=body)
+
+        def delete_address_scope(self, address_scope):
+            """Deletes the specified address scope."""
+            return self.delete(self.address_scope_path % (address_scope))
