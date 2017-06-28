@@ -16,6 +16,10 @@ subnet = "10.2.0.0/24"
 grid_ip = "10.39.12.121"
 grid_master_name = "infoblox.localdomain"
 custom_net_view = "openstack_view"
+ext_network = "ext_net"
+ext_subnet_name = "ext_sub"
+ext_subnet = "10.39.12.0/24"
+
 
 class TestOpenStackCases(unittest.TestCase):
     @classmethod
@@ -2016,6 +2020,380 @@ class TestOpenStackCases(unittest.TestCase):
 
     @pytest.mark.run(order=124)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Subnet(self):
+        session = util.utils()
+        delete_net = session.delete_network(network)
+        assert delete_net == None
+
+    @pytest.mark.run(order=125)
+    def test_EAs_disable_DHCPSupport_and_DNSSupport_ExternalDomainNamePattern(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "False"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "False"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{tenant_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{ip_address}"},\
+                "Default Network View": {"value": "default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "True"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "True"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+
+    @pytest.mark.run(order=126)
+    def test_add_ExternalNetwork_disable_DHCPSupport_and_DNSSupport_ExternalNetwork(self):
+        proc = util.utils()
+        address=proc.create_network(ext_network, external=True, shared=True)
+        ext_net = proc.create_subnet(ext_network,ext_subnet_name,ext_subnet)
+        flag = proc.get_network(network)
+        assert flag == ext_network
+
+    @pytest.mark.run(order=127)
+    def test_validate_network_disable_EAs_DHCPSupport_and_DNSSupport_ExternalNetwork(self):
+        flag = False
+        proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+ext_subnet)
+        if (re.search(r""+ext_subnet,proc)):
+            flag = True
+        assert flag, "External Network creation failed "
+
+    @pytest.mark.run(order=128)
+    def test_validate_network_EAs_ExternalNetwork(self):
+        session = util.utils()
+        ext_net_name = session.get_network(ext_network)
+        ext_net_id = session.get_network_id(ext_network)
+        ext_sub_name = session.get_subnet_name(ext_subnet_name)
+        ext_snet_ID = session.get_subnet_id(ext_subnet_name)
+        ext_tenant_id = session.get_tenant_id(ext_network)
+        proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+ext_subnet)
+        resp = json.loads(proc)
+        ref_v = resp[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type = ref_v + '?_return_fields=extattrs'))
+        assert EAs['extattrs']['Network Name']['value'] == ext_net_name and \
+               EAs['extattrs']['Network ID']['value'] == ext_net_id and \
+               EAs['extattrs']['Subnet Name']['value'] == ext_sub_name and \
+               EAs['extattrs']['Subnet ID']['value'] == ext_snet_ID and \
+               EAs['extattrs']['Network Encap']['value'] == 'vxlan' and \
+               EAs['extattrs']['Cloud API Owned']['value'] == 'False' and \
+               EAs['extattrs']['Tenant Name']['value'] == tenant_name and \
+               EAs['extattrs']['Is External']['value'] == 'True' and \
+               EAs['extattrs']['Is Shared']['value'] == 'True'
+
+    @pytest.mark.run(order=129)
+    def test_validate_NIOS_Router_ExternalNetwork(self):
+        proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+ext_subnet)
+        resp = json.loads(proc)
+        ref_v = resp[0]['_ref']
+        options = json.loads(wapi_module.wapi_request('GET',object_type = ref_v + '?_return_fields=options'))
+        route_list = options['options']
+        list_route = route_list[1]
+        route_nios = list_route['value']
+        ip = IPNetwork(ext_subnet).iter_hosts()
+        route = str(ip.next())
+        assert route_nios == route
+
+    @pytest.mark.run(order=130)
+    def test_delete_net_subnet_disable_EAs_DHCPSupport_and_DNSSupport_ExternalNetwork(self):
+        session = util.utils()
+        delete_net = session.delete_network(ext_network)
+        assert delete_net == None
+
+    @pytest.mark.run(order=131)
+    def test_select_EAs_ExternalDomainNamePattern_as_SubnetID_and_ExternalHostNamePattern_as_InstanceName(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{tenant_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{ip_address}"},\
+                "Default Network View": {"value": "default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "True"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "True"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+
+    @pytest.mark.run(order=132)
+    def test_create_network_ExternalDomainNamePattern_as_SubnetID_and_ExternalHostNamePattern_as_InstanceName(self):
+        proc = util.utils()
+        proc.create_network(ext_network, external = True, shared = True)
+        proc.create_subnet(ext_network, ext_subnet_name, ext_subnet)
+        flag = proc.get_subnet_name(ext_subnet_name)
+        flag = proc.get_subnet_name(ext_subnet_name)
+        assert flag == ext_subnet_name
+
+    @pytest.mark.run(order=133)
+    def test_validate_member_assiged_network_ExternalNetwork(self):
+        resp = json.loads(wapi_module.wapi_request('GET',object_type = 'network',params="?network="+ext_subnet))
+        ref_v = resp[0]['_ref']
+        members = json.loads(wapi_module.wapi_request('GET',object_type = ref_v+'?_return_fields=members'))
+        name = members['members'][0]['name']
+        assert grid_master_name == name, "Member has not been assign to Netwrok"
+
+    @pytest.mark.run(order=134)
+    def test_validate_zone_name_ExternalDomainNamePattern_as_SubnetID(self):
+        session = util.utils()
+        ext_snet_ID = session.get_subnet_id(ext_subnet_name)
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v[0]['fqdn']
+        assert ext_snet_ID+'.external.global.com' == zone_name
+
+    @pytest.mark.run(order=135)
+    def test_validate_zone_EAs_ExternalDomainNamePattern_as_SubnetID(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        ref = ref_v[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=extattrs'))
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned_nios = EAs['extattrs']['Cloud API Owned']['value']
+        session = util.utils()
+        tenant_id_openstack = session.get_tenant_id(network)
+        assert tenant_id_openstack == tenant_id_nios and \
+               tenant_name_nios == tenant_name and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned_nios == 'False'
+
+    @pytest.mark.run(order=136)
+    def test_deploy_instnace_ExternalHostNamePattern_as_InstanceName(self):
+        proc = util.utils()
+        proc.launch_instance(instance_name,ext_network)
+        instance = proc.get_server_name()
+        status = proc.get_server_status()
+        assert instance_name == instance and status == 'ACTIVE'
+
+    @pytest.mark.run(order=137)
+    def test_validate_a_record_ExternalHostNamePattern_as_InstanceName(self):
+        ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+        ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+        a_record_name = ref_v_a_record[0]['name']
+        assert a_record_name == instance_name+'.'+zone_name
+
+    @pytest.mark.run(order=138)
+    def test_validate_a_record_EAs_HostNamePattern_as_HostIPAddress(self):
+        a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+        ref_v = a_record[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        vm_name_nios = EAs['extattrs']['VM Name']['value']
+        vm_id_nios = EAs['extattrs']['VM ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        vm_id_openstack = proc.get_servers_id()
+        vm_name_openstack = proc.get_server_name()
+        vm_tenant_id_openstack = proc.get_server_tenant_id()
+        ip_adds = proc.get_instance_ips(instance_name)
+        inst_ip_address = ip_adds[ext_network][0]['addr']
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            port_id_openstack = port_list_openstack['ports'][0]['id']
+            device_id_openstack = port_list_openstack['ports'][0]['device_id']
+            device_owner_opstk = 'compute:None'
+        else:
+            port_id_openstack = port_list_openstack['ports'][1]['id']
+            device_id_openstack = port_list_openstack['ports'][1]['device_id']
+            device_owner_opstk = 'compute:None'
+        assert vm_name_nios == vm_name_openstack and \
+               vm_id_nios == vm_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               tenant_id_nios == vm_tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_opstk == device_owner_nios and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'False' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=139)
+    def test_validate_host_record_entry_ExternalNetwork(self):
+        ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        host_record_name = host_records[0]['name']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
+        else:
+            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+
+        host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
+        assert host_record_name == host_record_openstack
+
+    @pytest.mark.run(order=140)
+    def test_validate_host_record_entry_EAs_ExternalNetwork(self):
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        ref_v = host_records[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+             port_id_openstack = port_list_openstack['ports'][0]['id']
+             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
+             device_id_openstack = port_list_openstack['ports'][0]['device_id']
+             device_owner_opstk = 'network:dhcp'
+        else:
+             port_id_openstack = port_list_openstack['ports'][1]['id']
+             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
+             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+             device_owner_opstk = 'network:dhcp'
+        assert tenant_id_nios == tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_nios == device_owner_opstk and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'False' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=141)
+    def test_validate_host_record_entry_MACAddress_ExternalNetwork(self):
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+        mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'network:dhcp':
+            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
+        else:
+            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+
+        assert mac_address_nios == mac_address_openstack
+
+    @pytest.mark.run(order=142)
+    def test_validate_fixed_address_ExternalHostNamePattern_InstanceName(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
+        fixed_address_nios = ref_v[0]['ipv4addr']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
+        else:
+            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+
+        assert fixed_address_nios == ip_address_opstk
+
+    @pytest.mark.run(order=143)
+    def test_validate_mac_address_fixed_address_instance_ExternalHostNamePattern_as_InstanceName(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
+        ref = ref_v[0]['_ref']
+        mac_add = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=mac'))
+        mac_add_nios = mac_add['mac']
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
+        else:
+            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+        assert mac_add_nios == mac_address_openstack
+
+    @pytest.mark.run(order=144)
+    def test_validate_fixed_address_EAs_ExternalHostNamePattern_as_InstaanceName(self):
+        fixed_add = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
+        ref_v = fixed_add[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=extattrs'))
+        vm_name_nios = EAs['extattrs']['VM Name']['value']
+        vm_id_nios = EAs['extattrs']['VM ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        vm_id_openstack = proc.get_servers_id()
+        vm_name_openstack = proc.get_server_name()
+        vm_tenant_id_openstack = proc.get_server_tenant_id()
+        ip_adds = proc.get_instance_ips(instance_name)
+        inst_ip_address = ip_adds[ext_network][0]['addr']
+        port_list_openstack = proc.list_ports()
+        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+        if device_owner_openstack == 'compute:None':
+            port_id_openstack = port_list_openstack['ports'][0]['id']
+            device_id_openstack = port_list_openstack['ports'][0]['device_id']
+            device_owner_opstk = 'compute:None'
+        else:
+            port_id_openstack = port_list_openstack['ports'][1]['id']
+            device_id_openstack = port_list_openstack['ports'][1]['device_id']
+            device_owner_opstk = 'compute:None'
+        assert vm_name_nios == vm_name_openstack and \
+               vm_id_nios == vm_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               tenant_id_nios == vm_tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_opstk == device_owner_nios and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'False' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=145)
+    def test_terminate_instance_ExternalHostNamePattern_as_InstanceName(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
+
+    @pytest.mark.run(order=146)
+    def test_delete_net_subnet_ExternalHostNamePattern_as_InstanceName(self):
         session = util.utils()
         delete_net = session.delete_network(network)
         assert delete_net == None

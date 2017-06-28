@@ -4,6 +4,7 @@ from neutronclient.v2_0 import client
 import os,sys
 from novaclient.client import Client
 import time
+import commands
 #import create_address_scope
 #os.system('export OS_USERNAME=admin')
 #os.system('export OS_PASSWORD=admin')
@@ -28,12 +29,12 @@ class utils:
             self.neutron = client.Client(session=sess)
 	    self.nova_client = Client(VERSION,session=sess)
 
-	def create_network(self,name, external=False):
+	def create_network(self,name, external=False, shared=False):
 	    ''''
 	    Add a Network OpenStack Side
 	      Pass the Network Name as Arg
 	    '''
-            network = {'network': {'name': name, 'admin_state_up': True, 'router:external' : external}}
+            network = {'network': {'name': name, 'admin_state_up': True, 'router:external' : external, 'shared': shared}}
             netw = self.neutron.create_network(body=network)
 	
 	def get_network(self,name):
@@ -162,7 +163,7 @@ class utils:
 
     	def create_router(self, router_name, network_name):
             net_id = self.get_network_id(network_name)
-            route = {'router': {'name': router_name, 'admin_state_up': True, 'external_gateway_info': {'network_id': net_id1}}}
+            route = {'router': {'name': router_name, 'admin_state_up': True, 'external_gateway_info': {'network_id': net_id}}}
             router = self.neutron.create_router(body=route)
 
 	def get_routers_name(self,router_name):
@@ -246,14 +247,26 @@ class utils:
             return self.get(self.address_scope_path % (address_scope),
                         params=_params)
 
-        def create_address_scope(self, body=None):
+        def add_address_scope(self):
+	    #cmd = '/bin/bash -c "source /opt/devstack/openrc admin admin"'
+	    #os.system(cmd)
             """Creates a new address scope."""
 	    import pdb
 	    pdb.set_trace()
-	    body_create = {'address_scope': [{'name': 'addressScope','shared':'address-scope-ip4','ip_version':4}]}
+	    name = 'address_scope'
+	    body_create = {'address_scope': [{'name': name,'ip_version': 4,'share':True,'tenant_id':"a8524601f16f4bf3a27e8f60b25bd46d"}]}
 	    addressScope = self.neutron.create_address_scope(body=body_create)
 	    return addressScope
             #return self.post(self.address_scopes_path, body=body)
+	    #if ip_version == 4:
+            #    cmd = 'openstack address scope create --share' + ' ' +name+ ' ' + '--ip-version' + ip_version
+            #    proc=commands.getoutput(cmd)
+            #    return proc
+            #else:
+            #    cmd = 'neutron address-scope-create --shared' + ' ' +name+ ' ' + ip_version
+            #    proc=commands.getoutput(cmd)
+            #    return proc
+
 
         def update_address_scope(self, address_scope, body=None):
             """Updates a address scope."""
@@ -262,3 +275,4 @@ class utils:
         def delete_address_scope(self, address_scope):
             """Deletes the specified address scope."""
             return self.delete(self.address_scope_path % (address_scope))
+
