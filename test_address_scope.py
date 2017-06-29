@@ -340,13 +340,13 @@ class TestOpenStackCases(unittest.TestCase):
                device_id_nios == device_id_openstack
 
     @pytest.mark.run(order=222)
-    def test_terminate_instance_DefaultNetworkViewScope_as_Tenant(self):
+    def test_terminate_instance_DefaultNetworkViewScope_as_AddressScope(self)
         proc = util.utils()
         server = proc.terminate_instance()
         assert server == None
 
     @pytest.mark.run(order=223)
-    def test_delete_net_subnet_DefaultNetworkViewScope_as_Tenant(self):
+    def test_delete_net_subnet_DefaultNetworkViewScope_as_AddressScope(self):
         session = util.utils()
         delete_net = session.delete_network(network)
         assert delete_net == None
