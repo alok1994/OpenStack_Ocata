@@ -17,7 +17,7 @@ class utils:
             project_name='admin'
             project_domain_id='default'
             user_domain_id='default'
-            auth_url='http://10.39.12.121:5000/v3'
+            auth_url='http://10.39.12.141:5000/v3'
 	    VERSION = '2'
             auth = identity.Password(auth_url=auth_url,
                              username=username,
@@ -237,42 +237,52 @@ class utils:
     	def interface_detach(self, server, port_id):
             self.nova_client.servers.interface_detach(server=server, port_id=port_id) 
 
-        def list_address_scopes(self, retrieve_all=True, **_params):
+        def address_scopes_list(self,name,retrieve_all=True):
             """Fetches a list of all address scopes for a project."""
-            return self.list('address_scopes', self.address_scopes_path,
-                         retrieve_all, **_params)
+            names = self.neutron.list_address_scopes(name)
+	    return names
 
-        def show_address_scope(self, address_scope, **_params):
-            """Fetches information of a certain address scope."""
-            return self.get(self.address_scope_path % (address_scope),
-                        params=_params)
+        #def show_address_scope(self, address_scope, **_params):
+        #    """Fetches information of a certain address scope."""
+        #    return self.get(self.address_scope_path % (address_scope),
+        #                params=_params)
 
-        def add_address_scope(self):
-	    #cmd = '/bin/bash -c "source /opt/devstack/openrc admin admin"'
-	    #os.system(cmd)
+        def add_address_scope(self,name,ip_version):
             """Creates a new address scope."""
-	    import pdb
-	    pdb.set_trace()
-	    name = 'address_scope'
-	    body_create = {'address_scope': [{'name': name,'ip_version': 4,'share':True,'tenant_id':"a8524601f16f4bf3a27e8f60b25bd46d"}]}
-	    addressScope = self.neutron.create_address_scope(body=body_create)
+            body = {'address_scope': {'ip_version': ip_version, 'name': name}}
+	    addressScope = self.neutron.create_address_scope(body=body)
 	    return addressScope
-            #return self.post(self.address_scopes_path, body=body)
-	    #if ip_version == 4:
-            #    cmd = 'openstack address scope create --share' + ' ' +name+ ' ' + '--ip-version' + ip_version
-            #    proc=commands.getoutput(cmd)
-            #    return proc
-            #else:
-            #    cmd = 'neutron address-scope-create --shared' + ' ' +name+ ' ' + ip_version
-            #    proc=commands.getoutput(cmd)
-            #    return proc
 
+        #def update_address_scope(self, address_scope, body=None):
+        #    """Updates a address scope."""
+        #    return self.put(self.address_scope_path % (address_scope), body=body)
 
-        def update_address_scope(self, address_scope, body=None):
-            """Updates a address scope."""
-            return self.put(self.address_scope_path % (address_scope), body=body)
+        #def delete_address_scope(self, address_scope):
+        #    """Deletes the specified address scope."""
+        #    return self.delete(self.address_scope_path % (address_scope))
 
-        def delete_address_scope(self, address_scope):
-            """Deletes the specified address scope."""
-            return self.delete(self.address_scope_path % (address_scope))
+	def add_address_scope_subnetpool(self,address_network,add_sub_name,subnet,prefixlen): 
+            address_list = self.address_scopes_list(address_network)
+	    address_id = address_list['address_scopes'][0]['id']
+            tenant_id = address_list['address_scopes'][0]['tenant_id']
+            body_create_subnet = {'subnetpool': {'name': add_sub_name,'address_scope_id':address_id,\
+                                  'tenant_id': tenant_id,'prefixes':[subnet],'default_prefixlen':prefixlen}}
+            subnetpool = self.neutron.create_subnetpool(body=body_create_subnet)
+	    return subnetpool
 
+	def subnetpool_list(self,name,retrieve_all=True):
+	    names = self.neutron.list_subnetpools(name)
+	    return names
+
+	def add_subnet_address_scope(self,networkName,address_pool_name,subnetName):
+	    subnetpools_id = self.subnetpool_list(address_pool_name)
+	    subnetpool_id = subnetpools_id['subnetpools'][0]['id']
+            tenant_id = subnetpools_id['subnetpools'][0]['tenant_id']
+	    self.create_network(networkName)
+            net_id = self.get_network_id(networkName)	
+            body_create_subnet = {'subnets': [{'name': subnetName,'ip_version':4,\
+                                  'tenant_id': tenant_id, 'subnetpool_id': subnetpool_id,'network_id':net_id}]}
+            subnet = self.neutron.create_subnet(body=body_create_subnet)
+	    return subnet 
+
+	    
