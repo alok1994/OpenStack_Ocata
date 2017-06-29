@@ -19,6 +19,13 @@ custom_net_view = "openstack_view"
 ext_network = "ext_net"
 ext_subnet_name = "ext_sub"
 ext_subnet = "10.39.12.0/24"
+address_scope_name_ip4 = 'address_scope_ipv4'
+address_scope_name_ip6 = 'address_scope_ipv6'
+ip_version = [4,6]
+address_scope_subnet_name_ipv4 = 'subnet-pool-ip4'
+address_scope_subnet_name_ipv6 = 'subnet-pool-ip6'
+address_scope_pool_prefix = '200.0.113.0/26'
+address_scope_prefixlen = '26'
 
 
 class TestOpenStackCases(unittest.TestCase):
