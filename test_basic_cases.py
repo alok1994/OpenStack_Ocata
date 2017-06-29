@@ -3839,3 +3839,15 @@ class TestOpenStackCases(unittest.TestCase):
         delete_net = session.delete_network(network)
         assert delete_net == None
 
+    @pytest.mark.run(order=224)
+    def test_delete_SubnetPool(self):
+        proc = util.utils()
+        delete = proc.delete_subnetpool(address_scope_subnet_name_ipv4)
+        assert delete == ()
+
+    @pytest.mark.run(order=225)
+    def test_delete_AddressScope(self):
+        proc = util.utils()
+        delete = proc.delete_address_scopes(address_scope_name_ip4)
+        assert delete == ()
+

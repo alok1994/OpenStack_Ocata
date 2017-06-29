@@ -100,7 +100,7 @@ class utils:
             instance = self.nova_client.servers.create(name=name, image=image,\
                                                        flavor=flavor, nics=nic_id)
             time.sleep(60)
-            #return instance
+            return instance
 
         def get_servers_list(self):
             """
@@ -257,9 +257,12 @@ class utils:
         #    """Updates a address scope."""
         #    return self.put(self.address_scope_path % (address_scope), body=body)
 
-        #def delete_address_scope(self, address_scope):
-        #    """Deletes the specified address scope."""
-        #    return self.delete(self.address_scope_path % (address_scope))
+        def delete_address_scopes(self, address_scope):
+            """Deletes the specified address scope."""
+	    address_list = self.address_scopes_list(address_scope)
+            address_id = address_list['address_scopes'][0]['id']
+	    delete = self.neutron.delete_address_scope(address_id)
+            return delete
 
 	def add_address_scope_subnetpool(self,address_network,add_sub_name,subnet,prefixlen): 
             address_list = self.address_scopes_list(address_network)
@@ -285,4 +288,8 @@ class utils:
             subnet = self.neutron.create_subnet(body=body_create_subnet)
 	    return subnet 
 
-	    
+	def delete_subnetpool(self,subnetpool_name):
+	    subnetpools = self.subnetpool_list(subnetpool_name)
+	    subnetpool_id = subnetpools['subnetpools'][0]['id']
+	    delete = self.neutron.delete_subnetpool(subnetpool_id)
+	    return delete
