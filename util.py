@@ -17,7 +17,7 @@ class utils:
             project_name='admin'
             project_domain_id='default'
             user_domain_id='default'
-            auth_url='http://10.39.12.141:5000/v3'
+            auth_url='http://10.39.12.121:5000/v3'
 	    VERSION = '2'
             auth = identity.Password(auth_url=auth_url,
                              username=username,
