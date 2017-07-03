@@ -58,7 +58,7 @@ class utils:
 	    delete_net = self.neutron.delete_network(network_id)
             return None
 	
-	def create_subnet(self, network_name, subnet_name, subnet):
+	def create_subnet(self, network_name, subnet_name, subnet,ip_version = 4):
             """
                Creates a Subnet
                It takes Network Name, Subnet Name and Subnet as arguments.
@@ -67,7 +67,7 @@ class utils:
             """
             net_id = self.get_network_id(network_name)
 	    tenant_id = self.get_tenant_id(network_name)
-            body_create_subnet = {'subnets': [{'name': subnet_name, 'cidr': subnet, 'ip_version': 4,\
+            body_create_subnet = {'subnets': [{'name': subnet_name, 'cidr': subnet, 'ip_version': ip_version,\
                                   'tenant_id': tenant_id, 'network_id': net_id}]}
             subnet = self.neutron.create_subnet(body=body_create_subnet)
 
