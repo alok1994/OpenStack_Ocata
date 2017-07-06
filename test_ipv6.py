@@ -587,7 +587,7 @@ class TestOpenStackCases(unittest.TestCase):
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=40)
-    def test_validate_a_record_NetworkName_as_HostNamePattern(self):
+    def test_validate_a_record_NetworkName_as_HostNamePattern_ipv6(self):
         ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
         zone_name = ref_v_zone[0]['fqdn']
         ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:aaaa'))
@@ -598,3 +598,15 @@ class TestOpenStackCases(unittest.TestCase):
         network_name = proc.get_network(network_ipv6)
         fqdn = "host-"+network_name+'-'+'--'.join(ip_address.split('::'))+'.'+zone_name
         assert fqdn == a_record_name
+
+    @pytest.mark.run(order=41)
+    def test_terminate_instance_HostNamePattern_as_NetworkName_ipv6(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
+
+    @pytest.mark.run(order=42)
+    def test_delete_net_subnet_HostNamePattern_as_NetworkName_ipv6(self):
+        session = util.utils()
+	delete_net = session.delete_network(network_ipv6)
+	assert delete_net == None
