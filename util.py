@@ -5,11 +5,7 @@ import os,sys
 from novaclient.client import Client
 import time
 import commands
-#import create_address_scope
-#os.system('export OS_USERNAME=admin')
-#os.system('export OS_PASSWORD=admin')
-#os.system('export OS_TENANT_NAME=admin')
-#os.system('export OS_AUTH_URL=http://10.39.12.231:35357/v3')
+
 class utils:
 	def __init__(self):
             username='admin'
@@ -51,14 +47,18 @@ class utils:
             netw = self.neutron.create_network(body=network)
 	
 	def get_network(self,name):
-	    networks = self.neutron.list_networks(name)
-	    net_name = networks['networks'][0]['name']
-	    return net_name
+	    networks_list = self.neutron.list_networks(name)
+            qa_networks = networks_list['networks']
+            for l in range(len(qa_networks)):
+                if name == qa_networks[l]['name']:
+                   return qa_networks[l]['name']
 
 	def get_network_id(self,name):
-	    networks = self.neutron.list_networks(name)
-	    network_id = networks['networks'][0]['id']
-	    return network_id
+	    networks_list = self.neutron.list_networks(name)
+	    qa_networks = networks_list['networks']
+	    for l in range(len(qa_networks)):
+                if name == qa_networks[l]['name']:
+                   return qa_networks[l]['id']
 
 	def get_tenant_id(self,name):
 	    tenant = self.neutron.list_networks(name)
@@ -66,10 +66,9 @@ class utils:
             return tenant_id
 
 	def delete_network(self,name):
-            networks = self.neutron.list_networks(name)
-            network_id = networks['networks'][0]['id']
+            network_id = self.get_network_id(name)
 	    delete_net = self.neutron.delete_network(network_id)
-            return None
+            return delete_net
 	
 	def create_subnet(self, network_name, subnet_name, subnet,ip_version = 4):
             """
@@ -85,18 +84,21 @@ class utils:
             subnet = self.neutron.create_subnet(body=body_create_subnet)
 
 	def get_subnet_name(self,subnet_name):
-            subnets = self.neutron.list_subnets(subnet_name)
-            sub_name = subnets['subnets'][0]['name']
-            return sub_name
-
+            subnets_list = self.neutron.list_subnets(subnet_name)
+	    qa_subnets = subnets_list['subnets']
+	    for l in range(len(qa_subnets)):
+	        if subnet_name == qa_subnets[l]['name']:
+                   return subnet_name
+	  
         def get_subnet_id(self,subnet_name):
-            subnets = self.neutron.list_subnets(subnet_name)
-            sub_id = subnets['subnets'][0]['id']
-            return sub_id
+	    subnets_list = self.neutron.list_subnets(subnet_name)
+            qa_subnets = subnets_list['subnets']
+            for l in range(len(qa_subnets)):
+                if subnet_name == qa_subnets[l]['name']:
+                   return qa_subnets[l]['id']
 
 	def delete_subnet(self,subnet_name):
- 	    subnets = self.neutron.list_subnets(subnet_name)
-            sub_id = subnets['subnets'][0]['id']
+	    sub_id = self.get_subnet_id(subnet_name)
 	    delete_sub = self.neutron.delete_subnets(sub_id)
 	    return None	    
 
