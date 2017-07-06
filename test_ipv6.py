@@ -113,7 +113,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_disable_EAs_DHCPSupport_and_DNSSupport_ipv6(self):
         session = util.utils()
 	delete_net = session.delete_network(network_ipv6)
-	assert delete_net == None
+	assert delete_net == ()
 
     @pytest.mark.run(order=7)
     def test_select_True_DHCPSupport_DNSSupport_DomainNamePattern_as_TenantName_EAs_ipv6(self):
@@ -369,8 +369,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_HostNamePattern_as_HostIPAddress_ipv6(self):
         session = util.utils()
 	delete_net = session.delete_network(network_ipv6)
-	assert delete_net == None
-	
+	assert delete_net == ()
+
     @pytest.mark.run(order=22)
     def test_EAs_SubnetName_as_HostName_pattern_and_NetworkName_as_DomainName_pattern_ipv6(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
@@ -447,7 +447,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_subnet_used_NetworkName_as_DomainName_pattern_ipv6(self):
         session = util.utils()
 	delete_net = session.delete_network(network_ipv6)
-	assert delete_net == None
+	assert delete_net == ()
 
     @pytest.mark.run(order=29)
     def test_EAs_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern_ipv6(self):
@@ -527,8 +527,8 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=35)
     def test_delete_subnet_used_NetworkID_as_DomainNamePattern_ipv6(self):
         session = util.utils()
-	delete_net = session.delete_network(network)
-	assert delete_net == None
+	delete_net = session.delete_network(network_ipv6)
+	assert delete_net == ()
 
     @pytest.mark.run(order=36)
     def test_EAs_SubnetName_as_DomainNamePattern_and_NetworkName_as_HostNamePattern_ipv6(self):
@@ -609,4 +609,5 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_HostNamePattern_as_NetworkName_ipv6(self):
         session = util.utils()
 	delete_net = session.delete_network(network_ipv6)
-	assert delete_net == None
+	assert delete_net == ()
+
