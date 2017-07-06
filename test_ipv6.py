@@ -278,5 +278,7 @@ class TestOpenStackCases(unittest.TestCase):
             mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
         else:
             mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
-
-        assert mac_address_nios == '*:'+mac_address_openstack
+	flag = False
+	if (mac_address_nios.startswith(("00:")) and mac_address_nios.endswith((mac_address_openstack))):
+	    flag = True
+        assert flag
