@@ -14,20 +14,33 @@ class utils:
 	def __init__(self):
             username='admin'
             password='admin'
+	    tenant_name='admin'
             project_name='admin'
             project_domain_id='default'
             user_domain_id='default'
-            auth_url='http://10.39.12.121:5000/v3'
-	    VERSION = '2'
-            auth = identity.Password(auth_url=auth_url,
+	    keystone_version = "v3"
+	    if keystone_version == 'v3':
+               auth_url='http://10.39.12.121:5000/v3'
+	       VERSION = '2'
+               auth = identity.Password(auth_url=auth_url,
                              username=username,
                              password=password,
                              project_name=project_name,
                              project_domain_id=project_domain_id,
                              user_domain_id=user_domain_id)
-            sess = session.Session(auth = auth)
-            self.neutron = client.Client(session=sess)
-	    self.nova_client = Client(VERSION,session=sess)
+               sess = session.Session(auth = auth)
+               self.neutron = client.Client(session=sess)
+	       self.nova_client = Client(VERSION,session=sess)
+	    else:
+	       auth_url='http://10.39.12.121:5000/v2.0'
+	       VERSION = '2'
+	       auth = identity.Password(auth_url=auth_url,
+		             tenant_name=tenant_name,
+                             username=username,
+                             password=password)
+               sess = session.Session(auth = auth)
+               self.neutron = client.Client(session=sess)
+               self.nova_client = Client(VERSION,session=sess)
 
 	def create_network(self,name, external=False, shared=False):
 	    ''''

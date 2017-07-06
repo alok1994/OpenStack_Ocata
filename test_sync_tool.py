@@ -846,3 +846,167 @@ class TestOpenStackCases(unittest.TestCase):
             flag = True
         assert flag, "Network View failed to delete"
 
+    @pytest.mark.run(order=58)
+    def test_select_TenantName_as_DefaultDomainNamePattern_Update_sync_tool(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{tenant_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{ip_address}"},\
+                "Default Network View": {"value":"default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+        time.sleep(20)
+
+    @pytest.mark.run(order=59)
+    def test_create_network_DefaultDomainNamePattern_as_TenantName_update_sync_tool(self):
+        proc = util.utils()
+        proc.create_network(network)
+        proc.create_subnet(network, subnet_name, subnet)
+        flag = proc.get_subnet_name(subnet_name)
+        flag = proc.get_subnet_name(subnet_name)
+        assert flag == subnet_name
+
+    @pytest.mark.run(order=60)
+    def test_validate_network_DefaultDomainNamePattern_TenantName_update_sync_tool(self):
+        networks = json.loads(wapi_module.wapi_request('GET',object_type='network'))
+        network_nios = networks[0]['network']
+        network_view = networks[0]['network_view']
+        assert network_nios == subnet and \
+               network_view == "default"
+
+    @pytest.mark.run(order=61)
+    def test_validate_zone_name_DomainNamePattern_as_TenantName_EAs(self):
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+	zone_name = ref_v[0]['fqdn']
+	assert tenant_name+'.cloud.global.com' == zone_name
+
+    @pytest.mark.run(order=62)
+    def test_delete_network_NIOS_DefaultDomainNamePattern_as_TenantName_update_sync_tool(self):
+        flag = False
+        proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
+        resp = json.loads(proc)
+        ref_v = resp[0]['_ref']
+        delete = wapi_module.wapi_request('DELETE',object_type = ref_v)
+        if (re.search(r""+subnet,delete)):
+            flag = True
+        assert flag, "Network failed to delete"
+        time.sleep(60)
+
+    @pytest.mark.run(order=63)
+    def test_select_updated_TenantID_as_DefaultDomainNamePattern_Update_sync_tool(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{tenant_id}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{ip_address}"},\
+                "Default Network View": {"value":"default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+        time.sleep(20)
+
+    @pytest.mark.run(order=64)
+    def test_RUNSYNCTool_after_update_TenantName_to_TenantID_EAs_sync_tool(self):
+        os.system('rm -rf log.txt')
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        proc = commands.getoutput(cmd)
+        a=open('log.txt','rb')
+        lines = a.readlines()
+        if lines:
+           last_line = lines[-1]
+        migration = last_line.find('Ending migration...')
+        flag = True
+        if migration < 1:
+            flag = False
+        assert flag
+
+    @pytest.mark.run(order=65)
+    def test_validate_zone_name_after_update_DomainNamePattern_as_TenantID_EAs(self):
+	import pdb;pdb.set_trace()
+	session = util.utils()
+        tenant_id = session.get_tenant_id(network)
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v[0]['fqdn']
+	zone_name1 = ref_v[1]['fqdn']
+	flag = False
+	if zone_name == tenant_id+'.cloud.global.com':
+	    flag = True
+	elif zone_name1 == tenant_id+'.cloud.global.com':
+	    flag = True
+        assert flag
+
+    @pytest.mark.run(order=66)
+    def test_validate_host_record_entry_after_update_DomainNamePattern(self):
+	session = util.utils()
+        tenant_id = session.get_tenant_id(network)
+	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+	zone_name1 = ref_v_zone[1]['fqdn']
+	if zone_name == tenant_id+'.cloud.global.com':
+            host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+            host_record_name = host_records[0]['name']
+            proc = util.utils()
+            port_list_openstack = proc.list_ports()
+            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+            if device_owner_openstack == 'network:dhcp':
+                ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
+            else:
+                ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+
+            host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
+	else:
+	    host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+            host_record_name = host_records[0]['name']
+            proc = util.utils()
+            port_list_openstack = proc.list_ports()
+            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
+            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
+            if device_owner_openstack == 'network:dhcp':
+                ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
+            else:
+                ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+
+            host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name1
+
+        assert host_record_name == host_record_openstack

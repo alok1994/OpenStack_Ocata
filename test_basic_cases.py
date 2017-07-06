@@ -3850,6 +3850,7 @@ class TestOpenStackCases(unittest.TestCase):
         proc = util.utils()
         delete = proc.delete_address_scopes(address_scope_name_ip4)
         assert delete == ()
+	time.sleep(10)
 
     @pytest.mark.run(order=226)
     def test_select_IPAllocationStrategy_as_HostReocrd(self):
@@ -3881,7 +3882,8 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+grid_master_name,proc)):
             flag = True
         assert proc != "" and flag
-
+	time.sleep(10)
+	
     @pytest.mark.run(order=227)
     def test_create_network_IPAllocationStrategy_as_HostReocrd(self):
         proc = util.utils()
