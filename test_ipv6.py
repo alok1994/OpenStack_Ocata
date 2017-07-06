@@ -358,3 +358,243 @@ class TestOpenStackCases(unittest.TestCase):
                cmp_type_nios == 'OpenStack' and \
                cloud_api_owned == 'True' and \
                device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=20)
+    def test_terminate_instance_HostNamePattern_as_HostIPAddress_ipv6(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
+
+    @pytest.mark.run(order=21)
+    def test_delete_net_subnet_HostNamePattern_as_HostIPAddress_ipv6(self):
+        session = util.utils()
+	delete_net = session.delete_network(network_ipv6)
+	assert delete_net == None
+	
+    @pytest.mark.run(order=22)
+    def test_EAs_SubnetName_as_HostName_pattern_and_NetworkName_as_DomainName_pattern_ipv6(self):
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+	ref = ref_v[0]['_ref']
+	data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{network_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{subnet_name}-{ip_address}"},\
+                "Default Network View": {"value": "default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}} 
+	proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+	flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+
+    @pytest.mark.run(order=23)
+    def test_create_network_NetworkName_as_DomainName_Pattern_openstack_side_ipv6(self):
+	proc = util.utils()
+        proc.create_network(network_ipv6)
+	proc.create_subnet(network_ipv6, subnet_name_ipv6, subnet_ipv6,ip_version = 6)
+        flag = proc.get_subnet_name(subnet_name_ipv6)
+	flag = proc.get_subnet_name(subnet_name_ipv6)
+        assert flag == subnet_name_ipv6
+
+    @pytest.mark.run(order=24)
+    def test_validate_zone_name_NetworkName_as_DomainName_pattern_ipv6(self):
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+	zone_name = ref_v[0]['fqdn']
+	assert network_ipv6+'.cloud.global.com' == zone_name
+
+    @pytest.mark.run(order=25)
+    def test_deploy_instance_SubnetName_as_HostName_Pattern_ipv6(self):
+	proc = util.utils()
+	proc.launch_instance(instance_name,network_ipv6)
+	instance = proc.get_server_name()
+        status = proc.get_server_status()
+	assert instance_name == instance and status == 'ACTIVE'
+
+    @pytest.mark.run(order=26)
+    def test_validate_A_Record_SubnetName_as_HostName_Pattern_ipv6(self):
+	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+	zone_name = ref_v_zone[0]['fqdn']
+	ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:aaaa'))
+	a_record_name = ref_v_a_record[0]['name']
+	proc = util.utils()
+	ip_add = proc.get_instance_ips(instance_name)
+	ip_address = ip_add[network_ipv6][0]['addr']
+	fqdn = "host-"+subnet_name_ipv6+'-'+'--'.join(ip_address.split('::'))+'.'+zone_name
+	assert fqdn == a_record_name
+
+    @pytest.mark.run(order=27)
+    def test_terminate_instance_used_SubnetName_as__HostName_pattern_ipv6(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
+
+    @pytest.mark.run(order=28)
+    def test_delete_subnet_used_NetworkName_as_DomainName_pattern_ipv6(self):
+        session = util.utils()
+	delete_net = session.delete_network(network_ipv6)
+	assert delete_net == None
+
+    @pytest.mark.run(order=29)
+    def test_EAs_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern_ipv6(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{network_id}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{subnet_id}-{ip_address}"},\
+                "Default Network View": {"value": "default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+
+    @pytest.mark.run(order=30)
+    def test_create_network_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern_ipv6(self):
+        proc = util.utils()
+        proc.create_network(network_ipv6)
+        proc.create_subnet(network_ipv6, subnet_name_ipv6, subnet_ipv6,ip_version=6)
+        flag = proc.get_subnet_name(subnet_name_ipv6)
+        flag = proc.get_subnet_name(subnet_name_ipv6)
+        assert flag == subnet_name_ipv6
+
+    @pytest.mark.run(order=31)
+    def test_validate_zone_name_as_NetworkID_DomainNamePattern_ipv6(self):
+        proc = util.utils()
+        network_id = proc.get_network_id(network_ipv6)
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v[0]['fqdn']
+        assert network_id+'.cloud.global.com' == zone_name
+
+    @pytest.mark.run(order=32)
+    def test_deploy_instance_SubnetID_as_HostNamePattern_ipv6(self):
+        proc = util.utils()
+        proc.launch_instance(instance_name,network_ipv6)
+        instance = proc.get_server_name()
+        status = proc.get_server_status()
+        assert instance_name == instance and status == 'ACTIVE'
+
+    @pytest.mark.run(order=33)
+    def test_validate_aaaa_record_SubnetID_as_HostNamePattern_ipv6(self):
+        ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+        ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:aaaa'))
+        a_record_name = ref_v_a_record[0]['name']
+        proc = util.utils()
+        ip_add = proc.get_instance_ips(instance_name)
+        ip_address = ip_add[network_ipv6][0]['addr']
+        subnet_id = proc.get_subnet_id(subnet_name_ipv6)
+        fqdn = "host-"+subnet_id+'-'+'--'.join(ip_address.split('::'))+'.'+zone_name
+        assert fqdn == a_record_name
+
+    @pytest.mark.run(order=34)
+    def test_terminate_instance_used_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern_ipv6(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
+
+    @pytest.mark.run(order=35)
+    def test_delete_subnet_used_NetworkID_as_DomainNamePattern_ipv6(self):
+        session = util.utils()
+	delete_net = session.delete_network(network)
+	assert delete_net == None
+
+    @pytest.mark.run(order=36)
+    def test_EAs_SubnetName_as_DomainNamePattern_and_NetworkName_as_HostNamePattern_ipv6(self):
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        ref = ref_v[0]['_ref']
+        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+                "Allow Service Restart": {"value": "True"},\
+                "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
+                "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
+                "DNS Record Removable Types": {"value": ["record:a","record:aaaa","record:ptr","record:txt"]},\
+                "DNS Record Unbinding Types": {"value": ["record:a","record:aaaa","record:ptr"]},\
+                "DNS Support": {"value": "True"},"DNS View": {"value": "default"},\
+                "Default Domain Name Pattern": {"value": "{subnet_name}.cloud.global.com"},\
+                "Default Host Name Pattern": {"value": "host-{network_name}-{ip_address}"},\
+                "Default Network View": {"value": "default"},\
+                "Default Network View Scope": {"value": "Single"},\
+                "External Domain Name Pattern": {"value": "{subnet_id}.external.global.com"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
+                "Grid Sync Maximum Wait Time": {"value": 10},\
+                "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
+                "IP Allocation Strategy": {"value": "Fixed Address"},\
+                "Relay Support": {"value": "False"},\
+                "Report Grid Sync Time": {"value": "True"},\
+                "Tenant Name Persistence": {"value": "False"},\
+                "Use Grid Master for DHCP": {"value": "True"},\
+                "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
+        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+        flag = False
+        if (re.search(r""+grid_master_name,proc)):
+            flag = True
+        assert proc != "" and flag
+
+    @pytest.mark.run(order=37)
+    def test_create_network_SubnetName_as_DomainNamePattern_and_NetworkName_as_HostNamePattern_ipv6(self):
+        proc = util.utils()
+        proc.create_network(network_ipv6)
+        proc.create_subnet(network_ipv6, subnet_name_ipv6, subnet_ipv6,ip_version=6)
+        flag = proc.get_subnet_name(subnet_name_ipv6)
+        flag = proc.get_subnet_name(subnet_name_ipv6)
+        assert flag == subnet_name_ipv6
+
+    @pytest.mark.run(order=38)
+    def test_validate_zone_name_as_SubnetName_DomainNamePattern_ipv6(self):
+        proc = util.utils()
+        name_subnet = proc.get_subnet_name(subnet_name_ipv6)
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v[0]['fqdn']
+        assert name_subnet+'.cloud.global.com' == zone_name
+
+    @pytest.mark.run(order=39)
+    def test_deploy_instance_NetworkName_as_HostNamePattern_ipv6(self):
+        proc = util.utils()
+        proc.launch_instance(instance_name,network_ipv6)
+        instance = proc.get_server_name()
+        status = proc.get_server_status()
+        assert instance_name == instance and status == 'ACTIVE'
+
+    @pytest.mark.run(order=40)
+    def test_validate_a_record_NetworkName_as_HostNamePattern(self):
+        ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        zone_name = ref_v_zone[0]['fqdn']
+        ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:aaaa'))
+        a_record_name = ref_v_a_record[0]['name']
+        proc = util.utils()
+        ip_add = proc.get_instance_ips(instance_name)
+        ip_address = ip_add[network_ipv6][0]['addr']
+        network_name = proc.get_network(network_ipv6)
+        fqdn = "host-"+network_name+'-'+'--'.join(ip_address.split('::'))+'.'+zone_name
+        assert fqdn == a_record_name
