@@ -187,7 +187,7 @@ class utils:
             return router
 
     	def get_router_id(self, route_name):
-	    routers = self.neutron.list_router()
+	    routers = self.neutron.list_routers()
 	    router_id = routers['routers'][0]['id']
 	    return router_id
 
@@ -210,10 +210,10 @@ class utils:
             port_id = ports['ports'][0]['id']
 	    return port_id
 
-    	def add_router_interface(self, interface_name, router_name):
+    	def add_router_interface(self, interface_name, router_name,subnet_name):
             router_id = self.get_router_id(router_name)
-            port_id = self.get_port_id(interface_name)
-            body = {'port_id':port_id}
+	    sub_id = self.get_subnet_id(subnet_name)
+            body = {'subnet_id':sub_id}
             router = self.neutron.add_interface_router(router=router_id, body=body)
 
     	def remove_router_interface(self, interface_name, router_name):
@@ -222,8 +222,9 @@ class utils:
             body = {'port_id':port_id}
             router = self.neutron_client.remove_interface_router(router=router_id, body=body)
 
-    	def add_floating_ip(self, instance_name):
-            floating_ip = self.nova_client.floating_ips.create()
+    	def add_floating_ip(self, interface_name,instance_name,ext_net,ext_subnet):
+	    ports = self.create_port(interface_name,ext_net)
+            floating_ip = self.nova_client.floating_ips.create(self.nova_client.floating_ip_pools.list()[0].name)
             instance = self.nova_client.servers.find(name=instance_name)
             instance.add_floating_ip(floating_ip)
 
