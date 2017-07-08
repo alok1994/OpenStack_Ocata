@@ -156,7 +156,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkView_as_Default_EAs_sync_tool(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
-	assert delete_net == None
+	assert delete_net == ()
 
     @pytest.mark.run(order=9)
     def test_select_NetworkViewScope_as_TenantEAs_sync_tool(self):
@@ -327,7 +327,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Tenant_EAs_sync_tool(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=21)
     def test_delete_NetworkViewTenant_DefaultNetworkViewScope_as_Tenant_sync_tool_OpenStack_922(self):
@@ -512,7 +512,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Network_EAs_sync_tool(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
  
     @pytest.mark.run(order=34)
     def test_delete_NetworkView_as_Network_DefaultNetworkViewScope_as_Network_sync_tool_OpenStack_922(self):
@@ -698,7 +698,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Subnet_EAs_sync_tool(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=47)
     def test_delete_NetworkView_as_Subnet_DefaultNetworkViewScope_as_Subnet_sync_tool_OpenStack_922(self):
@@ -833,7 +833,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkView_as_CustomNetworkView_EAs_sync_tool(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=57)
     def test_delete_NetworkView_as_CustomNetworkView_DefaultNetworkViewScope_as_CustomNetworkView_sync_tool(self):

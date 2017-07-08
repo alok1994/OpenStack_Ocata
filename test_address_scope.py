@@ -349,5 +349,5 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkViewScope_as_AddressScope(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 

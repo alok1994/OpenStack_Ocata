@@ -325,7 +325,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_CustomDNSView_as_DNSView_OPENSTACK917(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
-	assert delete_net == None
+	assert delete_net == ()
   
     @pytest.mark.run(order=17)
     def test_delete_CustomDNSView_as_DNSView_OPENSTACK917(self):
@@ -665,7 +665,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_CustomNetworkView_CustomDNSView(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == () 
 
     @pytest.mark.run(order=37)
     def test_delete_CustomDNSView_as_DNSView(self):

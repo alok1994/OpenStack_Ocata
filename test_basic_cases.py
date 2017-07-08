@@ -139,7 +139,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_disable_EAs_DHCPSupport_and_DNSSupport(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
-	assert delete_net == None
+	assert delete_net == ()
 
     @pytest.mark.run(order=10)
     def test_validate_delete_network_disable_EAs_DHCPSupport_and_DNSSupport(self):
@@ -436,7 +436,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_HostNamePattern_as_HostIPAddress(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
-	assert delete_net == None	
+	assert delete_net == ()	
 
        # Default Domain Name Pattern : {network_name}.cloud.global.com
        # Default Host Name Pattern : host-{subnet_name}-{ip_address}
@@ -516,7 +516,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_subnet_used_NetworkName_as_DomainName_pattern(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
-	assert delete_net == None
+	assert delete_net == ()
 
     @pytest.mark.run(order=34)
     def test_EAs_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern(self):
@@ -597,7 +597,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_subnet_used_NetworkID_as_DomainNamePattern(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
-	assert delete_net == None
+	assert delete_net == ()
 
     #"Default Domain Name Pattern":"{subnet_name}.cloud.global.com"
     #"Default Host Name Pattern": "host-{network_name}-{ip_address}"
@@ -680,7 +680,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_subnet_used_SubnetName_as_DomainNamePattern(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
-	assert delete_net == None
+	assert delete_net == ()
 
     @pytest.mark.run(order=48)
     def test_EAs_SubnetID_as_DomainNamePattern_and_NetworkID_as_HostNamePattern(self):
@@ -761,7 +761,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_subnet_used_SubnetID_as_DomainNamePattern(self):
         session = util.utils()
 	delete_net = session.delete_network(network)
-	assert delete_net == None
+	assert delete_net == () 
 
     @pytest.mark.run(order=55)
     def test_add_custom_network_view(self):
@@ -1081,7 +1081,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_CustomNetworkView(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=73)
     def test_delete_CustomNetworkView(self):
@@ -1405,7 +1405,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Tenant(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=91)
     def test_select_DefaultNetworkViewScope_as_Network(self):
@@ -1717,7 +1717,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Network(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=108)
     def test_select_DefaultNetworkViewScope_as_Subnet(self):
@@ -1765,7 +1765,7 @@ class TestOpenStackCases(unittest.TestCase):
         network_nios = networks[0]['network']
         network_view = networks[0]['network_view']
         session = util.utils()
-        subnet_id = session.get_subnet_id(network)
+        subnet_id = session.get_subnet_id(subnet_name)
         assert network_nios == subnet and \
                network_view == subnet_name+'-'+subnet_id
 
@@ -2029,7 +2029,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Subnet(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=125)
     def test_EAs_disable_DHCPSupport_and_DNSSupport_ExternalDomainNamePattern(self):
@@ -2067,7 +2067,7 @@ class TestOpenStackCases(unittest.TestCase):
         proc = util.utils()
         address=proc.create_network(ext_network, external=True, shared=True)
         ext_net = proc.create_subnet(ext_network,ext_subnet_name,ext_subnet)
-        flag = proc.get_network(network)
+        flag = proc.get_network(ext_network)
         assert flag == ext_network
 
     @pytest.mark.run(order=127)
@@ -2117,7 +2117,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_disable_EAs_DHCPSupport_and_DNSSupport_ExternalNetwork(self):
         session = util.utils()
         delete_net = session.delete_network(ext_network)
-        assert delete_net == None
+        assert delete_net == () 
 
     @pytest.mark.run(order=131)
     def test_select_EAs_ExternalDomainNamePattern_as_SubnetID_and_ExternalHostNamePattern_as_InstanceName(self):
@@ -2402,8 +2402,8 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=146)
     def test_delete_net_subnet_ExternalHostNamePattern_as_InstanceName(self):
         session = util.utils()
-        delete_net = session.delete_network(network)
-        assert delete_net == None
+        delete_net = session.delete_network(ext_network)
+        assert delete_net == ()
 
     @pytest.mark.run(order=147)
     def test_select_EAs_ExternalDomainNamePattern_as_SubnetName_and_ExternalHostNamePattern_as_InstanceNameInstanceID(self):
@@ -2681,7 +2681,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_ExternalHostNamePattern_as_InstanceNameInstanceID(self):
         session = util.utils()
         delete_net = session.delete_network(ext_network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=162)
     def test_select_EAs_ExternalDomainNamePattern_as_NetworkName_and_ExternalHostNamePattern_as_TenantNameTenantID(self):
@@ -2959,7 +2959,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_ExternalHostNamePattern_as_TenantNameTenantID(self):
         session = util.utils()
         delete_net = session.delete_network(ext_network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=177)
     def test_select_EAs_ExternalDomainNamePattern_as_NetworkID_and_ExternalHostNamePattern_as_SubnetNameTenantID(self):
@@ -3239,7 +3239,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_ExternalHostNamePattern_as_SubnetNameTenantID(self):
         session = util.utils()
         delete_net = session.delete_network(ext_network)
-        assert delete_net == None
+        assert delete_net == () 
 
     @pytest.mark.run(order=192)
     def test_select_EAs_ExternalDomainNamePattern_as_TenantNameTenantID_and_ExternalHostNamePattern_as_SubnetIDTenantName(self):
@@ -3519,7 +3519,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_ExternalHostNamePattern_as_SubnetIDTenantName(self):
         session = util.utils()
         delete_net = session.delete_network(ext_network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=207)
     def test_select_DefaultNetworkViewScope_as_AddressScope(self):
@@ -3837,7 +3837,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_DefaultNetworkViewScope_as_AddressScope(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
     @pytest.mark.run(order=224)
     def test_delete_SubnetPool(self):
@@ -3899,7 +3899,7 @@ class TestOpenStackCases(unittest.TestCase):
         network_nios = networks[0]['network']
         network_view = networks[0]['network_view']
         session = util.utils()
-        subnet_id = session.get_subnet_id(network)
+        subnet_id = session.get_subnet_id(subnet_name)
         assert network_nios == subnet and \
                network_view == subnet_name+'-'+subnet_id
 
@@ -4267,6 +4267,6 @@ class TestOpenStackCases(unittest.TestCase):
     def test_delete_net_subnet_IPAllocationStrategy_as_HostReocrd(self):
         session = util.utils()
         delete_net = session.delete_network(network)
-        assert delete_net == None
+        assert delete_net == ()
 
 
