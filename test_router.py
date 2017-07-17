@@ -237,7 +237,7 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=13)
     def test_validate_a_record_from_internal_network_for_router(self):
         ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
-        for l in range(len(ref_v)):
+        for l in range(len(ref_v_zone)):
            zone_names = ref_v_zone[l]['fqdn']
            if zone_names.startswith((tenant_name)) and zone_names.endswith(('.cloud.global.com')):
 	       zone_name = ref_v_zone[l]['fqdn']
@@ -257,6 +257,66 @@ class TestOpenStackCases(unittest.TestCase):
         assert a_record_name == a_record_openstack
 
     @pytest.mark.run(order=14)
+    def test_validate_fixed_address_for_router_of_internal_Network(self):
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('network:router_interface' == ports_list[l]['device_owner']):
+               ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress',params="?ipv4addr="+ip_address_opstk))
+	fixed_address_nios = ref_v[0]['ipv4addr']
+        assert fixed_address_nios == ip_address_opstk
+    
+    @pytest.mark.run(order=15)
+    def test_validate_fixed_address_EAs_router_for_internal_network(self):
+	proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:router_interface' == ports_list[l]['device_owner']):
+               ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
+	       port_id_openstack = ports_list[l]['id']
+	       device_id_openstack = ports_list[l]['device_id']
+	       device_owner_opstk = 'network:router_interface'
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress',params="?ipv4addr="+ip_address_opstk))
+        ref_v_fixaddr = ref_v[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v_fixaddr+'?_return_fields=extattrs'))
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        tenant_id_openstack = proc.get_tenant_id(network)
+        assert tenant_id_nios == tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               ip_type_nios == 'Fixed' and \
+               device_owner_nios == device_owner_opstk and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'True' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=16)
+    def test_validate_mac_address_fixed_address_for_router_of_internal_network(self):
+	proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:router_interface' == ports_list[l]['device_owner']):
+               ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
+	       mac_address_openstack = ports_list[l]['mac_address']
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress',params="?ipv4addr="+ip_address_opstk))
+        ref = ref_v[0]['_ref']
+        mac_add = json.loads(wapi_module.wapi_request('GET',object_type=ref+'?_return_fields=mac'))
+        mac_add_nios = mac_add['mac']
+	
+        assert mac_add_nios == mac_address_openstack
+
+    @pytest.mark.run(order=17)
     def test_validate_a_record_EAs_InternalNetwrok_Interface_router(self):
 	a_records = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
         for l in range(len(a_records)):
@@ -290,7 +350,7 @@ class TestOpenStackCases(unittest.TestCase):
                cloud_api_owned == 'True' and \
                device_id_nios == device_id_openstack
 
-    @pytest.mark.run(order=15)
+    @pytest.mark.run(order=18)
     def test_deploy_instnace_with_internal_network_router(self):
 	proc = util.utils()
 	proc.launch_instance(instance_name,network)
@@ -298,7 +358,7 @@ class TestOpenStackCases(unittest.TestCase):
         status = proc.get_server_status()
 	assert instance_name == instance and status == 'ACTIVE'
 
-    @pytest.mark.run(order=16)
+    @pytest.mark.run(order=19)
     def test_validate_a_record_of_instance_from_internal_network(self):
         a_records = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
         for l in range(len(a_records)):
@@ -319,7 +379,7 @@ class TestOpenStackCases(unittest.TestCase):
 	       fqdn = "host-"+'-'.join(ip_address.split('.'))+'.'+zone_name
 	assert fqdn_nios == fqdn
 
-    @pytest.mark.run(order=17)
+    @pytest.mark.run(order=20)
     def test_validate_a_record_EAs_of_instance_from_internal_network(self):
         a_records = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
         for l in range(len(a_records)):
@@ -346,16 +406,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-	    device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-	    device_owner_opstk = 'compute:None'
+        ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+               port_id_openstack = ports_list[l]['id']
+               device_id_openstack = ports_list[l]['device_id']
+	       device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -367,19 +423,20 @@ class TestOpenStackCases(unittest.TestCase):
                cloud_api_owned == 'True' and \
                device_id_nios == device_id_openstack
 
-    @pytest.mark.run(order=18)
-    def test_validate_fixed_address_for_internal_network_router(self):
-	import pdb;pdb.set_trace()
-        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress'))
-        fixed_address_nios = ref_v[0]['ipv4addr']
+    @pytest.mark.run(order=21)
+    def test_validate_fixed_address_for_instance_using_internal_network(self):
         proc = util.utils()
         port_list_openstack = proc.list_ports()
         ports_list = port_list_openstack['ports']
         for l in range(len(ports_list)):
-           if ('network:router_interface' == ports_list[l]['device_owner']):
-	       ip_address_opstk = ports_list['fixed_ips'][0][ip_address]
+           if ('compute:None' == ports_list[l]['device_owner']):
+	       ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
 
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress',params="?ipv4addr="+ip_address_opstk))
+        fixed_address_nios = ref_v[0]['ipv4addr']
+	
         assert fixed_address_nios == ip_address_opstk
+
 
 '''
     @pytest.mark.run(order=7)
