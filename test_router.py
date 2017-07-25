@@ -431,12 +431,14 @@ class TestOpenStackCases(unittest.TestCase):
 
     @pytest.mark.run(order=23)
     def test_validate_for_floating_ip_external_network(self):
+	ipadd_nios = ""
+	fqdn_nios  = ""
 	a_records = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
         for l in range(len(a_records)):
            record_name = a_records[l]['name']
            if (record_name.startswith(('inst'))):
                fqdn_nios = a_records[l]['name']
-	       ipaddr = a_records[l]['ipv4addr']
+	       ipadd_nios = a_records[l]['ipv4addr']
         ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	proc = util.utils()
         port_list_openstack = proc.list_ports()
@@ -444,7 +446,7 @@ class TestOpenStackCases(unittest.TestCase):
         for l in range(len(ports_list)):
            if ('network:floatingip' == ports_list[l]['device_owner']):
                ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
-	assert ip_address_opstk == ipaddr and \
+	assert ip_address_opstk == ipadd_nios and \
 	       fqdn_nios == instance_name+'.'+ext_subnet_name+'.external.global.com'
 
     @pytest.mark.run(order=24)
@@ -542,18 +544,20 @@ class TestOpenStackCases(unittest.TestCase):
 	assert delete == ()
 
     @pytest.mark.run(order=28)
-    def test_delete_ExternalNetwork_Used_for_Router(self):
-        proc = util.utils()
-	port_list_openstack = proc.list_ports()
-        ports_list = port_list_openstack['ports']
-        for l in range(len(ports_list)):
-           if ('interface_name' == ports_list[l]['name']):
-              port_id_openstack = ports_list[l]['id']
-        delete_net = session.delete_network(ext_network)
-        assert delete_net == ()
-
-    @pytest.mark.run(order=29)
     def test_delete_Internal_Network_Used_For_Router(self):
         session = util.utils()
         delete_net = session.delete_network(network)
         assert delete_net == ()
+
+    @pytest.mark.run(order=29)
+    def test_delete_ExternalNetwork_Used_for_Router(self):
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('interface_name' == ports_list[l]['name']):
+              port_id_openstack = ports_list[l]['id']
+	delete_port = proc.delete_port(port_id_openstack)
+        delete_net = proc.delete_network(ext_network)
+        assert delete_net == ()
+

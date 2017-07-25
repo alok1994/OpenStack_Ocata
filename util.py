@@ -309,3 +309,8 @@ class utils:
 	    subnetpool_id = subnetpools['subnetpools'][0]['id']
 	    delete = self.neutron.delete_subnetpool(subnetpool_id)
 	    return delete
+
+	def delete_port(self, port_id):
+            """Deletes the specified port."""
+            return self.neutron.delete_port(port_id)
+
