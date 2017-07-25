@@ -193,20 +193,21 @@ class utils:
 
         def delete_router(self, router_name):
             router_id = self.get_router_id(router_name)
-            self.neutron.delete_router(router=router_id)
+            return self.neutron.delete_router(router=router_id)
 
     	def create_port(self, interface_name, network_name):
             net_id = self.get_network_id(network_name)
             port = {'port': {'name': interface_name, 'admin_state_up': True, 'network_id': net_id}}
             port_info = self.neutron.create_port(body=port)
+	    return port_info
 
     	def get_ports(self,interface_name):
             ports = self.neutron.list_ports(interface_name)
             port_name = ports['ports'][0]['name']
 	    return port_name
 
-    	def get_port_id(self, interface_name):
-	    ports = self.neutron.list_ports(interface_name)
+    	def get_port_id(self):
+	    ports = self.neutron.list_ports()
             port_id = ports['ports'][0]['id']
 	    return port_id
 
@@ -216,11 +217,10 @@ class utils:
             body = {'subnet_id':sub_id}
             router = self.neutron.add_interface_router(router=router_id, body=body)
 
-    	def remove_router_interface(self, interface_name, router_name):
+    	def remove_router_interface(self,router_name,port_id):
             router_id = self.get_router_id(router_name)
-            port_id = self.get_port_id(interface_name)
             body = {'port_id':port_id}
-            router = self.neutron_client.remove_interface_router(router=router_id, body=body)
+            router = self.neutron.remove_interface_router(router=router_id, body=body)
 
     	def add_floating_ip(self, interface_name,instance_name,ext_net,ext_subnet):
 	    ports = self.create_port(interface_name,ext_net)

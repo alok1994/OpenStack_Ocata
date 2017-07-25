@@ -98,12 +98,10 @@ class TestOpenStackCases(unittest.TestCase):
         a_record_name = a_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:router_gateway':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:router_gateway' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         a_record_openstack = "router-gw-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert a_record_name == a_record_openstack
@@ -124,15 +122,11 @@ class TestOpenStackCases(unittest.TestCase):
         proc = util.utils()
         port_list_openstack = proc.list_ports()
 	tenant_id_openstack = proc.get_tenant_id(ext_network)
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:router_gateway':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:router_gateway'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:router_gateway' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
              device_owner_opstk = 'network:router_gateway'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -149,12 +143,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:router_gateway':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-	else: 
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:router_gateway' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
 
         assert fixed_address_nios == ip_address_opstk
 
@@ -166,12 +158,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:router_gateway':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:router_gateway' == ports_list[l]['device_owner']):
+             mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=9)
@@ -190,15 +180,12 @@ class TestOpenStackCases(unittest.TestCase):
         proc = util.utils()
         port_list_openstack = proc.list_ports()
         tenant_id_openstack = proc.get_tenant_id(ext_network)
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:router_gateway':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:router_gateway'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:router_gateway' == ports_list[l]['device_owner']):
+             ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
              device_owner_opstk = 'network:router_gateway'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -437,12 +424,136 @@ class TestOpenStackCases(unittest.TestCase):
 	
         assert fixed_address_nios == ip_address_opstk
 
-
-'''
-    @pytest.mark.run(order=7)
-    def test_attach_floating_ip(self):
+    @pytest.mark.run(order=22)
+    def test_attach_floating_ip_to_instance(self):
 	proc = util.utils()
 	proc.add_floating_ip(interface_name,instance_name,ext_network,ext_subnet_name)
-'''
 
-	
+    @pytest.mark.run(order=23)
+    def test_validate_for_floating_ip_external_network(self):
+	a_records = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+        for l in range(len(a_records)):
+           record_name = a_records[l]['name']
+           if (record_name.startswith(('inst'))):
+               fqdn_nios = a_records[l]['name']
+	       ipaddr = a_records[l]['ipv4addr']
+        ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+	proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:floatingip' == ports_list[l]['device_owner']):
+               ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
+	assert ip_address_opstk == ipaddr and \
+	       fqdn_nios == instance_name+'.'+ext_subnet_name+'.external.global.com'
+
+    @pytest.mark.run(order=24)
+    def test_validate_a_record_EAs_of_floatingIP_from_external_network_OPENSTACK_926(self):
+        a_records = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+        for l in range(len(a_records)):
+           record_name = a_records[l]['name']
+           if (record_name.startswith(('inst'))):
+               fqdn_nios = a_records[l]['name']
+        records = json.loads(wapi_module.wapi_request('GET',object_type='record:a',params="?name="+fqdn_nios))
+        ref_v_a = records[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v_a+'?_return_fields=extattrs'))
+        vm_name_nios = EAs['extattrs']['VM Name']['value']
+        vm_id_nios = EAs['extattrs']['VM ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        proc = util.utils()
+        vm_id_openstack = proc.get_servers_id()
+        vm_name_openstack = proc.get_server_name()
+        vm_tenant_id_openstack = proc.get_server_tenant_id()
+        ip_adds = proc.get_instance_ips(instance_name)
+        inst_ip_address = ip_adds[network][0]['addr']
+        port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:floatingip' == ports_list[l]['device_owner']):
+               port_id_openstack = ports_list[l]['id']
+               device_id_openstack = ports_list[l]['device_id']
+               device_owner_opstk = 'compute:None'
+	assert vm_name_nios == vm_name_openstack and \
+               vm_id_nios == vm_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               tenant_id_nios == vm_tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               ip_type_nios == 'Floating' and \
+               device_owner_opstk == device_owner_nios and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'False' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=25)
+    def test_validate_fixed_address_EAs_router_for_external_network_OPENSTACK_926(self):
+        proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:floatingip' == ports_list[l]['device_owner']):
+               ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
+               port_id_openstack = ports_list[l]['id']
+               device_id_openstack = ports_list[l]['device_id']
+               device_owner_opstk = 'network:router_interface'
+        ref_v = json.loads(wapi_module.wapi_request('GET',object_type='fixedaddress',params="?ipv4addr="+ip_address_opstk))
+        ref_v_fixaddr = ref_v[0]['_ref']
+        EAs = json.loads(wapi_module.wapi_request('GET',object_type=ref_v_fixaddr+'?_return_fields=extattrs'))
+        tenant_id_nios = EAs['extattrs']['Tenant ID']['value']
+        tenant_name_nios = EAs['extattrs']['Tenant Name']['value']
+        port_id_nios = EAs['extattrs']['Port ID']['value']
+        ip_type_nios = EAs['extattrs']['IP Type']['value']
+        device_id_nios = EAs['extattrs']['Port Attached Device - Device ID']['value']
+        device_owner_nios = EAs['extattrs']['Port Attached Device - Device Owner']['value']
+        cmp_type_nios = EAs['extattrs']['CMP Type']['value']
+        cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
+        tenant_id_openstack = proc.get_tenant_id(network)
+        assert tenant_id_nios == tenant_id_openstack and \
+               port_id_nios == port_id_openstack and \
+               tenant_name_nios == tenant_name and \
+               ip_type_nios == 'Floating' and \
+               device_owner_nios == device_owner_opstk and \
+               cmp_type_nios == 'OpenStack' and \
+               cloud_api_owned == 'False' and \
+               device_id_nios == device_id_openstack
+
+    @pytest.mark.run(order=26)
+    def test_terminate_instance_external_internal_floating_ip(self):
+        proc = util.utils()
+        server = proc.terminate_instance()
+        assert server == None
+
+    @pytest.mark.run(order=27)
+    def test_delete_router(self):
+	proc = util.utils()
+        port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:router_interface' == ports_list[l]['device_owner']):
+	      port_id_openstack = ports_list[l]['id']
+	proc.remove_router_interface(router_name,port_id_openstack)
+	delete = proc.delete_router(router_name)
+	assert delete == ()
+
+    @pytest.mark.run(order=28)
+    def test_delete_ExternalNetwork_Used_for_Router(self):
+        proc = util.utils()
+	port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('interface_name' == ports_list[l]['name']):
+              port_id_openstack = ports_list[l]['id']
+        delete_net = session.delete_network(ext_network)
+        assert delete_net == ()
+
+    @pytest.mark.run(order=29)
+    def test_delete_Internal_Network_Used_For_Router(self):
+        session = util.utils()
+        delete_net = session.delete_network(network)
+        assert delete_net == ()
