@@ -75,6 +75,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+grid_master_name,proc)):
             flag = True
         assert proc != "" and flag
+	time.sleep(5)
 
     @pytest.mark.run(order=3)
     def test_create_network_CustomDNSView_as_DNSView_OPENSTACK917(self):
@@ -116,6 +117,7 @@ class TestOpenStackCases(unittest.TestCase):
 	instance = proc.get_server_name()
         status = proc.get_server_status()
 	assert instance_name == instance and status == 'ACTIVE'
+	time.sleep(5)
 
     @pytest.mark.run(order=7)
     def test_validate_a_record_CustomDNSView_as_DNSView_OPENSTACK917(self):
@@ -319,7 +321,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_CustomDNSView_as_DNSView_OPENSTACK917(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=16)
     def test_delete_net_subnet_CustomDNSView_as_DNSView_OPENSTACK917(self):
@@ -659,7 +661,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_CustomNetworkView_CustomDNSView(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == [] 
 
     @pytest.mark.run(order=36)
     def test_delete_net_subnet_CustomNetworkView_CustomDNSView(self):
