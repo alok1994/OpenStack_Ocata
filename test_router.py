@@ -428,6 +428,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_attach_floating_ip_to_instance(self):
 	proc = util.utils()
 	proc.add_floating_ip(interface_name,instance_name,ext_network,ext_subnet_name)
+	time.sleep(10)
 
     @pytest.mark.run(order=23)
     def test_validate_for_floating_ip_external_network(self):
@@ -438,7 +439,9 @@ class TestOpenStackCases(unittest.TestCase):
            record_name = a_records[l]['name']
            if (record_name.startswith(('inst'))):
                fqdn_nios = a_records[l]['name']
+	       print fqdn_nios
 	       ipadd_nios = a_records[l]['ipv4addr']
+	       print ipadd_nios
         ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	proc = util.utils()
         port_list_openstack = proc.list_ports()
@@ -529,7 +532,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_external_internal_floating_ip(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=27)
     def test_delete_router(self):

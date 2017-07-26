@@ -114,8 +114,16 @@ class utils:
 	    nic_id = [{'net-id': net_id}]
             instance = self.nova_client.servers.create(name=name, image=image,\
                                                        flavor=flavor, nics=nic_id)
-            time.sleep(60)
-            return instance
+	    timeout = time.time() + 60*1
+            flag = 0
+            while True:
+		instances = self.nova_client.servers.list()
+                for instance in instances:
+		    status = instance.status
+		if status != 'ACTIVE' or time.time() > timeout:
+		    time.sleep(1)
+                    continue
+                break
 
         def get_servers_list(self):
             """
@@ -160,13 +168,19 @@ class utils:
               It takes Instance Name as argument.
             """
             server = self.get_servers_id()
-            if server:
-                self.nova_client.servers.delete(server)
-                time.sleep(60)
-		return None
-	    else:
-		server = self.get_servers_id()
-		return server
+            servers = self.nova_client.servers.delete(server)
+            timeout = time.time() + 60*1
+            while True:
+                instances = self.nova_client.servers.list()
+		if instances == [] or time.time() > timeout:
+		    return instances
+		    break
+                #for instance in instances:
+                #   status = instance.status
+		#    print status , instance
+                #if status == 'ACTIVE' or status == 'DELETING' or status == 'DELETED':
+                #    time.sleep(1)
+                #    continue
 
 	def list_ports(self, retrieve_all=True):
             """

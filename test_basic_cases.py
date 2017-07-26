@@ -430,7 +430,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_HostNamePattern_as_HostIPAddress(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=26)
     def test_delete_net_subnet_HostNamePattern_as_HostIPAddress(self):
@@ -510,7 +510,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_used_SubnetName_as__HostName_pattern(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=33)
     def test_delete_subnet_used_NetworkName_as_DomainName_pattern(self):
@@ -591,7 +591,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_used_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == [] 
 
     @pytest.mark.run(order=40)
     def test_delete_subnet_used_NetworkID_as_DomainNamePattern(self):
@@ -674,7 +674,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_used_SubnetName_as_DomainNamePattern_and_NetworkName_as_HostNamePattern(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=47)
     def test_delete_subnet_used_SubnetName_as_DomainNamePattern(self):
@@ -755,7 +755,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_used_SubnetID_as_DomainNamePattern_and_NetworkID_as_HostNamePattern(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=54)
     def test_delete_subnet_used_SubnetID_as_DomainNamePattern(self):
@@ -1075,7 +1075,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_CustomNetworkView(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=72)
     def test_delete_net_subnet_CustomNetworkView(self):
@@ -1399,7 +1399,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_DefaultNetworkViewScope_as_Tenant(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=90)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Tenant(self):
@@ -1711,7 +1711,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_DefaultNetworkViewScope_as_Network(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == [] 
 
     @pytest.mark.run(order=107)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Network(self):
@@ -2023,7 +2023,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_DefaultNetworkViewScope_as_Subnet(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=124)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Subnet(self):
@@ -2397,7 +2397,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_ExternalHostNamePattern_as_InstanceName(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == [] 
 
     @pytest.mark.run(order=146)
     def test_delete_net_subnet_ExternalHostNamePattern_as_InstanceName(self):
@@ -2675,7 +2675,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_ExternalHostNamePattern_as_InstanceNameInstanceID(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=161)
     def test_delete_net_subnet_ExternalHostNamePattern_as_InstanceNameInstanceID(self):
@@ -2953,7 +2953,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_ExternalHostNamePattern_as_TenantNameTenantID(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == [] 
 
     @pytest.mark.run(order=176)
     def test_delete_net_subnet_ExternalHostNamePattern_as_TenantNameTenantID(self):
@@ -3233,7 +3233,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_ExternalHostNamePattern_as_SubnetNameTenantID(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=191)
     def test_delete_net_subnet_ExternalHostNamePattern_as_SubnetNameTenantID(self):
@@ -3513,7 +3513,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_ExternalHostNamePattern_as_SubnetIDTenantName(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=206)
     def test_delete_net_subnet_ExternalHostNamePattern_as_SubnetIDTenantName(self):
@@ -3831,7 +3831,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_DefaultNetworkViewScope_as_AddressScope(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=223)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_AddressScope(self):
@@ -4261,7 +4261,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_IPAllocationStrategy_as_HostReocrd(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=241)
     def test_delete_net_subnet_IPAllocationStrategy_as_HostReocrd(self):
