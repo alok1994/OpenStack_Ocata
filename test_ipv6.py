@@ -363,7 +363,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_HostNamePattern_as_HostIPAddress_ipv6(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=21)
     def test_delete_net_subnet_HostNamePattern_as_HostIPAddress_ipv6(self):
@@ -441,7 +441,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_used_SubnetName_as__HostName_pattern_ipv6(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=28)
     def test_delete_subnet_used_NetworkName_as_DomainName_pattern_ipv6(self):
@@ -522,7 +522,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_used_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern_ipv6(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=35)
     def test_delete_subnet_used_NetworkID_as_DomainNamePattern_ipv6(self):
@@ -603,7 +603,7 @@ class TestOpenStackCases(unittest.TestCase):
     def test_terminate_instance_HostNamePattern_as_NetworkName_ipv6(self):
         proc = util.utils()
         server = proc.terminate_instance()
-        assert server == None
+        assert server == []
 
     @pytest.mark.run(order=42)
     def test_delete_net_subnet_HostNamePattern_as_NetworkName_ipv6(self):
