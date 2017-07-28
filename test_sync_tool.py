@@ -107,7 +107,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-	time.sleep(60)
+	#time.sleep(60)
 
     @pytest.mark.run(order=5)
     def test_RUNSYNCTool_network_DefaultNetworkView_as_Default_EAs_sync_tool(self):
@@ -217,7 +217,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-	time.sleep(60)
+	#time.sleep(60)
 
     @pytest.mark.run(order=13)
     def test_RUNSYNCTool_DefaultNetworkViewScope_as_Tenant_EAs_sync_tool(self):
@@ -276,7 +276,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+network_view,delete)):
             flag = True
         assert flag, "Network View failed to delete"
-        time.sleep(60)
+        #time.sleep(60)
 
     @pytest.mark.run(order=17)
     def test_RUNSYNCTool_NetworkView_DefaultNetworkView_as_Tenant_EAs_sync_tool(self):
@@ -402,7 +402,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-        time.sleep(60)
+        #time.sleep(60)
 
     @pytest.mark.run(order=26)
     def test_RUNSYNCTool_DefaultNetworkViewScope_as_Network_EAs_sync_tool(self):
@@ -461,7 +461,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+network_view,delete)):
             flag = True
         assert flag, "Network View failed to delete"
-        time.sleep(60)
+        #time.sleep(60)
 
     @pytest.mark.run(order=30)
     def test_RUNSYNCTool_NetworkView_DefaultNetworkView_as_Network_EAs_sync_tool(self):
@@ -574,7 +574,7 @@ class TestOpenStackCases(unittest.TestCase):
         network_nios = networks[0]['network']
         network_view = networks[0]['network_view']
         session = util.utils()
-        subnet_id = session.get_subnet_id(network)
+        subnet_id = session.get_subnet_id(subnet_name)
         assert network_nios == subnet and \
                network_view == subnet_name+'-'+subnet_id
 
@@ -588,7 +588,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-        time.sleep(60)
+        #time.sleep(60)
 
     @pytest.mark.run(order=39)
     def test_RUNSYNCTool_DefaultNetworkViewScope_as_Subnet_EAs_sync_tool(self):
@@ -611,7 +611,7 @@ class TestOpenStackCases(unittest.TestCase):
         network_nios = networks[0]['network']
         network_view = networks[0]['network_view']
         session = util.utils()
-        subnet_id = session.get_subnet_id(network)
+        subnet_id = session.get_subnet_id(subnet_name)
         assert network_nios == subnet and \
                network_view == subnet_name+'-'+subnet_id
 
@@ -647,7 +647,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+network_view,delete)):
             flag = True
         assert flag, "Network View failed to delete"
-        time.sleep(60)
+        #time.sleep(60)
 
     @pytest.mark.run(order=43)
     def test_RUNSYNCTool_NetworkView_DefaultNetworkViewScope_as_Subnet_EAs_sync_tool(self):
@@ -670,7 +670,7 @@ class TestOpenStackCases(unittest.TestCase):
         network_nios = networks[0]['network']
         network_view = networks[0]['network_view']
         session = util.utils()
-        subnet_id = session.get_subnet_id(network)
+        subnet_id = session.get_subnet_id(subnet_name)
         assert network_nios == subnet and \
                network_view == subnet_name+'-'+subnet_id
 
@@ -784,7 +784,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-        time.sleep(60)
+        #time.sleep(60)
 
     @pytest.mark.run(order=53)
     def test_RUNSYNCTool_DefaultNetworkView_as_CustomNetworkView_EAs_sync_tool(self):
@@ -911,7 +911,7 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-        time.sleep(60)
+        time.sleep(10)
 
     @pytest.mark.run(order=63)
     def test_select_updated_TenantID_as_DefaultDomainNamePattern_Update_sync_tool(self):
@@ -943,7 +943,6 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+grid_master_name,proc)):
             flag = True
         assert proc != "" and flag
-        time.sleep(20)
 
     @pytest.mark.run(order=64)
     def test_RUNSYNCTool_after_update_TenantName_to_TenantID_EAs_sync_tool(self):
@@ -958,55 +957,41 @@ class TestOpenStackCases(unittest.TestCase):
         flag = True
         if migration < 1:
             flag = False
-        assert flag
+        assert flag	
+	time.sleep(10)
 
     @pytest.mark.run(order=65)
     def test_validate_zone_name_after_update_DomainNamePattern_as_TenantID_EAs(self):
-	import pdb;pdb.set_trace()
 	session = util.utils()
         tenant_id = session.get_tenant_id(network)
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
-        zone_name = ref_v[0]['fqdn']
-	zone_name1 = ref_v[1]['fqdn']
 	flag = False
-	if zone_name == tenant_id+'.cloud.global.com':
-	    flag = True
-	elif zone_name1 == tenant_id+'.cloud.global.com':
-	    flag = True
+	for l in range(len(ref_v)):
+	    zone_name = ref_v[l]['fqdn']
+            if (zone_name.startswith((tenant_id)) and zone_name.endswith(('.cloud.global.com'))):
+                flag = True
         assert flag
 
     @pytest.mark.run(order=66)
     def test_validate_host_record_entry_after_update_DomainNamePattern(self):
-	session = util.utils()
-        tenant_id = session.get_tenant_id(network)
-	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
-        zone_name = ref_v_zone[0]['fqdn']
-	zone_name1 = ref_v_zone[1]['fqdn']
-	if zone_name == tenant_id+'.cloud.global.com':
-            host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
-            host_record_name = host_records[0]['name']
-            proc = util.utils()
-            port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'network:dhcp':
-                ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-            else:
-                ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ip_address = ""
+	proc = util.utils()
+        tenant_id = proc.get_tenant_id(network)
+        host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+	host_record_name = host_records[0]['name']
+        port_list_openstack = proc.list_ports()
+	port_list_openstack = proc.list_ports()
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
-            host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
-	else:
-	    host_records = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
-            host_record_name = host_records[0]['name']
-            proc = util.utils()
-            port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'network:dhcp':
-                ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-            else:
-                ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
-
-            host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name1
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
+        for l in range(len(ref_v)):
+            zone_name = ref_v[l]['fqdn']
+            if (zone_name.startswith((tenant_id)) and zone_name.endswith(('.cloud.global.com'))):
+	        zone_name_nios = ref_v[l]['fqdn']
+	host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name_nios
 
         assert host_record_name == host_record_openstack
+
