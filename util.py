@@ -114,14 +114,15 @@ class utils:
 	    nic_id = [{'net-id': net_id}]
             instance = self.nova_client.servers.create(name=name, image=image,\
                                                        flavor=flavor, nics=nic_id)
-	    timeout = time.time() + 60*1
-            flag = 0
+	    count = 60
+	   # timeout = time.time() + 60*1
             while True:
 		instances = self.nova_client.servers.list()
                 for instance in instances:
 		    status = instance.status
-		if status != 'ACTIVE' or time.time() > timeout:
+		if status != 'ACTIVE' or count <= 0:
 		    time.sleep(1)
+		    count = count - 1
                     continue
                 break
 
@@ -175,18 +176,11 @@ class utils:
 		if instances == [] or time.time() > timeout:
 		    return instances
 		    break
-                #for instance in instances:
-                #   status = instance.status
-		#    print status , instance
-                #if status == 'ACTIVE' or status == 'DELETING' or status == 'DELETED':
-                #    time.sleep(1)
-                #    continue
 
 	def list_ports(self, retrieve_all=True):
             """
                Fetches a list of all ports for a project.
             """
-            # Pass filters in "params" argument to do_request
             ports = self.neutron.list_ports()
 	    return ports
 
