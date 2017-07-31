@@ -123,8 +123,15 @@ class TestOpenStackCases(unittest.TestCase):
     def test_validate_a_record_CustomDNSView_as_DNSView_OPENSTACK917(self):
 	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v_zone[0]['fqdn']
-	ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
-	a_record_name = ref_v_a_record[0]['name']
+	count = 1
+        while count<=10:
+            ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+            if ref_v_a_record == []:
+                count = count + 1
+                time.sleep(1)
+                continue
+            a_record_name = ref_v_a_record[0]['name']
+            break
 	proc = util.utils()
 	ip_add = proc.get_instance_ips(instance_name)
 	ip_address = ip_add[network][0]['addr']
@@ -465,8 +472,15 @@ class TestOpenStackCases(unittest.TestCase):
     def test_validate_a_record_in_CustomNetwork_View_CustomDNSView(self):
         ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
         zone_name = ref_v_zone[0]['fqdn']
-        ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
-        a_record_name = ref_v_a_record[0]['name']
+	count = 1
+        while count<=10:
+            ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
+            if ref_v_a_record == []:
+                count = count + 1
+                time.sleep(1)
+                continue
+            a_record_name = ref_v_a_record[0]['name']
+            break
         proc = util.utils()
         ip_add = proc.get_instance_ips(instance_name)
         ip_address = ip_add[network][0]['addr']

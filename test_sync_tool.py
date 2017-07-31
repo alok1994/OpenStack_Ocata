@@ -995,3 +995,10 @@ class TestOpenStackCases(unittest.TestCase):
 
         assert host_record_name == host_record_openstack
 
+    @pytest.mark.run(order=67)
+    def test_delete_net_subnet_update_DomainNamePattern_sync_tool(self):
+        session = util.utils()
+	delete_net = session.delete_network(network)
+	assert delete_net == ()
+
+
