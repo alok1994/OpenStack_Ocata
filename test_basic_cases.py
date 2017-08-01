@@ -269,16 +269,13 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-	    device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-	    device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
+
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -298,12 +295,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -323,17 +318,12 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+	     port_id_openstack = ports_list[l]['id']
+	     tenant_id_openstack = ports_list[1]['tenant_id']
+             device_id_openstack = ports_list[l]['device_id']
              device_owner_opstk = 'network:dhcp'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -350,12 +340,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+	      mac_address_openstack = ports_list[l]['mac_address']	
 
         assert mac_address_nios == mac_address_openstack
 
@@ -365,12 +353,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-	else: 
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
 
         assert fixed_address_nios == ip_address_opstk
 
@@ -382,12 +368,11 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
+
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=24)
@@ -412,16 +397,13 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+	     port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
+
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -951,16 +933,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -980,12 +958,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -1005,17 +981,12 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+	     tenant_id_openstack = ports_list[l]['tenant_id']
+             device_id_openstack = ports_list[l]['device_id']
              device_owner_opstk = 'network:dhcp'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -1032,12 +1003,11 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
+
         assert mac_address_nios == mac_address_openstack
 
     @pytest.mark.run(order=68)
@@ -1046,12 +1016,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
         assert fixed_address_nios == ip_address_opstk
 
     @pytest.mark.run(order=69)
@@ -1062,12 +1030,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=70)
@@ -1092,16 +1058,13 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
+
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -1242,6 +1205,7 @@ class TestOpenStackCases(unittest.TestCase):
 
     @pytest.mark.run(order=81)
     def test_validate_a_record_DefaultNetworkViewScope_as_Tenant(self):
+	a_record_name = ''
         ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
         zone_name = ref_v_zone[0]['fqdn']
 	count = 1
@@ -1282,16 +1246,13 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
+
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -1311,12 +1272,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -1336,17 +1295,12 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+	     port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+	     tenant_id_openstack = ports_list[l]['tenant_id']
              device_owner_opstk = 'network:dhcp'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -1363,12 +1317,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+	      mac_address_openstack = ports_list[l]['mac_address']
         assert mac_address_nios == mac_address_openstack
 
     @pytest.mark.run(order=86)
@@ -1377,12 +1329,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
         assert fixed_address_nios == ip_address_opstk
 
     @pytest.mark.run(order=87)
@@ -1393,12 +1343,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=88)
@@ -1423,16 +1371,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -1601,16 +1545,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -1630,12 +1570,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -1655,17 +1593,12 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+	     tenant_id_openstack = ports_list[l]['tenant_id']
              device_owner_opstk = 'network:dhcp'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -1682,12 +1615,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_address_nios == mac_address_openstack
 
     @pytest.mark.run(order=103)
@@ -1696,12 +1627,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
         assert fixed_address_nios == ip_address_opstk
 
     @pytest.mark.run(order=104)
@@ -1712,12 +1641,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=105)
@@ -1742,16 +1669,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              port_id_openstack = ports_list[l]['id']
+              device_id_openstack = ports_list[l]['device_id']
+              device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -1920,16 +1843,13 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
+
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -1949,12 +1869,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -1974,18 +1892,13 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
              device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
-             device_owner_opstk = 'network:dhcp'
+             tenant_id_openstack = ports_list[l]['tenant_id']
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2001,12 +1914,11 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
+
         assert mac_address_nios == mac_address_openstack
 
     @pytest.mark.run(order=120)
@@ -2015,12 +1927,11 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+               ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
+  	
         assert fixed_address_nios == ip_address_opstk
 
     @pytest.mark.run(order=121)
@@ -2031,12 +1942,11 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
+
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=122)
@@ -2061,16 +1971,13 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
+
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2299,16 +2206,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2328,12 +2231,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -2353,18 +2254,13 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
              device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
-             device_owner_opstk = 'network:dhcp'
+             tenant_id_openstack = ports_list[l]['tenant_id']
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2380,12 +2276,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
 
         assert mac_address_nios == mac_address_openstack
 
@@ -2395,12 +2289,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
 
         assert fixed_address_nios == ip_address_opstk
 
@@ -2412,12 +2304,11 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+	      mac_address_openstack = ports_list[l]['mac_address']
+
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=144)
@@ -2442,16 +2333,13 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
+
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2584,16 +2472,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2613,12 +2497,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -2638,17 +2520,12 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+	     tenant_id_openstack = ports_list[l]['tenant_id']
              device_owner_opstk = 'network:dhcp'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -2665,13 +2542,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
-
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_address_nios == mac_address_openstack
 
     @pytest.mark.run(order=157)
@@ -2680,12 +2554,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
 
         assert fixed_address_nios == ip_address_opstk
 
@@ -2697,12 +2569,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=159)
@@ -2727,16 +2597,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2869,16 +2735,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+	for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2898,12 +2760,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -2923,18 +2783,13 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
              device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
-             device_owner_opstk = 'network:dhcp'
+             tenant_id_openstack = ports_list[l]['tenant_id']
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -2950,12 +2805,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
 
         assert mac_address_nios == mac_address_openstack
 
@@ -2965,12 +2818,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
 
         assert fixed_address_nios == ip_address_opstk
 
@@ -2982,12 +2833,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=174)
@@ -3012,16 +2861,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -3156,16 +3001,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -3185,13 +3026,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
-
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
 
@@ -3210,18 +3048,13 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
              device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
-             device_owner_opstk = 'network:dhcp'
+             tenant_id_openstack = ports_list[l]['tenant_id']
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -3237,12 +3070,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+        ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
 
         assert mac_address_nios == mac_address_openstack
 
@@ -3252,12 +3083,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
 
         assert fixed_address_nios == ip_address_opstk
 
@@ -3269,12 +3098,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=189)
@@ -3299,16 +3126,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -3443,16 +3266,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -3472,12 +3291,10 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -3497,17 +3314,12 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+	     tenant_id_openstack = ports_list[l]['tenant_id']
              device_owner_opstk = 'network:dhcp'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -3524,12 +3336,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
 
         assert mac_address_nios == mac_address_openstack
 
@@ -3539,13 +3349,10 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
-
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address_opstk = ports_list[l]['fixed_ips'][0]['ip_address']
         assert fixed_address_nios == ip_address_opstk
 
     @pytest.mark.run(order=203)
@@ -3556,12 +3363,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=204)
@@ -3586,16 +3391,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[ext_network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -3770,16 +3571,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -3799,14 +3596,11 @@ class TestOpenStackCases(unittest.TestCase):
         host_record_name = host_records[0]['name']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
-
-        host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
+	host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
 
     @pytest.mark.run(order=217)
@@ -3824,17 +3618,12 @@ class TestOpenStackCases(unittest.TestCase):
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-             port_id_openstack = port_list_openstack['ports'][0]['id']
-             tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][0]['device_id']
-             device_owner_opstk = 'network:dhcp'
-        else:
-             port_id_openstack = port_list_openstack['ports'][1]['id']
-             tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-             device_id_openstack = port_list_openstack['ports'][1]['device_id']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+	     tenant_id_openstack = ports_list[l]['tenant_id']
              device_owner_opstk = 'network:dhcp'
         assert tenant_id_nios == tenant_id_openstack and \
                port_id_nios == port_id_openstack and \
@@ -3851,12 +3640,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_address_nios = host_records[0]['ipv4addrs'][0]['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_address_nios == mac_address_openstack
 
     @pytest.mark.run(order=219)
@@ -3865,13 +3652,11 @@ class TestOpenStackCases(unittest.TestCase):
         fixed_address_nios = ref_v[0]['ipv4addr']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            ip_address_opstk = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address_opstk = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
-        assert fixed_address_nios == ip_address_opstk
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
+        assert fixed_address_nios == ip_address
 
     @pytest.mark.run(order=220)
     def test_validate_mac_address_fixed_address_DefaultNetworkViewScope_as_AddressScope(self):
@@ -3881,12 +3666,10 @@ class TestOpenStackCases(unittest.TestCase):
         mac_add_nios = mac_add['mac']
         proc = util.utils()
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-        else:
-            mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+              mac_address_openstack = ports_list[l]['mac_address']
         assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=221)
@@ -3911,16 +3694,12 @@ class TestOpenStackCases(unittest.TestCase):
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'compute:None':
-            port_id_openstack = port_list_openstack['ports'][0]['id']
-            device_id_openstack = port_list_openstack['ports'][0]['device_id']
-            device_owner_opstk = 'compute:None'
-        else:
-            port_id_openstack = port_list_openstack['ports'][1]['id']
-            device_id_openstack = port_list_openstack['ports'][1]['device_id']
-            device_owner_opstk = 'compute:None'
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('compute:None' == ports_list[l]['device_owner']):
+             port_id_openstack = ports_list[l]['id']
+             device_id_openstack = ports_list[l]['device_id']
+             device_owner_opstk = 'compute:None'
         assert vm_name_nios == vm_name_openstack and \
                vm_id_nios == vm_id_openstack and \
                tenant_name_nios == tenant_name and \
@@ -4186,12 +3965,10 @@ class TestOpenStackCases(unittest.TestCase):
         else:
            host_record_name = ref_v_host_record[0]['name']
         port_list_openstack = proc.list_ports()
-        device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-        device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-        if device_owner_openstack == 'network:dhcp':
-            ip_address = port_list_openstack['ports'][0]['fixed_ips'][0]['ip_address']
-        else:
-            ip_address = port_list_openstack['ports'][1]['fixed_ips'][0]['ip_address']
+	ports_list = port_list_openstack['ports']
+        for l in range(len(ports_list)):
+           if ('network:dhcp' == ports_list[l]['device_owner']):
+            ip_address = ports_list[l]['fixed_ips'][0]['ip_address']
 
         host_record_openstack = "dhcp-port-"+'-'.join(ip_address.split('.'))+'.'+zone_name
         assert host_record_name == host_record_openstack
@@ -4216,18 +3993,13 @@ class TestOpenStackCases(unittest.TestCase):
             cmp_type_nios = EAs['extattrs']['CMP Type']['value']
             cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
             port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'network:dhcp':
-                port_id_openstack = port_list_openstack['ports'][0]['id']
-                tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-                device_id_openstack = port_list_openstack['ports'][0]['device_id']
-                device_owner_opstk = 'network:dhcp'
-            else:
-                port_id_openstack = port_list_openstack['ports'][1]['id']
-                tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-                device_id_openstack = port_list_openstack['ports'][1]['device_id']
-                device_owner_opstk = 'network:dhcp'
+	    ports_list = port_list_openstack['ports']
+            for l in range(len(ports_list)):
+                if ('network:dhcp' == ports_list[l]['device_owner']):
+                   port_id_openstack = ports_list[l]['id']
+                   device_id_openstack = ports_list[l]['device_id']
+	           tenant_id_openstack = ports_list[l]['tenant_id']
+                   device_owner_opstk = 'network:dhcp'	
             assert tenant_id_nios == tenant_id_openstack and \
                 port_id_nios == port_id_openstack and \
                 tenant_name_nios == tenant_name and \
@@ -4249,18 +4021,13 @@ class TestOpenStackCases(unittest.TestCase):
             cmp_type_nios = EAs['extattrs']['CMP Type']['value']
             cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
             port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'network:dhcp':
-                port_id_openstack = port_list_openstack['ports'][0]['id']
-                tenant_id_openstack = port_list_openstack['ports'][0]['tenant_id']
-                device_id_openstack = port_list_openstack['ports'][0]['device_id']
-                device_owner_opstk = 'network:dhcp'
-            else:
-                port_id_openstack = port_list_openstack['ports'][1]['id']
-                tenant_id_openstack = port_list_openstack['ports'][1]['tenant_id']
-                device_id_openstack = port_list_openstack['ports'][1]['device_id']
-                device_owner_opstk = 'network:dhcp'
+	    ports_list = port_list_openstack['ports']
+            for l in range(len(ports_list)):
+                if ('network:dhcp' == ports_list[l]['device_owner']):
+                   port_id_openstack = ports_list[l]['id']
+                   device_id_openstack = ports_list[l]['device_id']
+	           tenant_id_openstack = ports_list[l]['tenant_id']
+                   device_owner_opstk = 'network:dhcp'
             assert tenant_id_nios == tenant_id_openstack and \
                 port_id_nios == port_id_openstack and \
                 tenant_name_nios == tenant_name and \
@@ -4281,22 +4048,18 @@ class TestOpenStackCases(unittest.TestCase):
         if host_record_ipaddr == ip_address:
             mac_address_nios = ref_v_host_record[1]['ipv4addrs'][0]['mac']
             port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'network:dhcp':
-                mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-            else:
-                mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	    ports_list = port_list_openstack['ports']
+            for l in range(len(ports_list)):
+               if ('network:dhcp' == ports_list[l]['device_owner']):
+                   mac_address_openstack = ports_list[l]['mac_address']
             assert mac_address_nios == mac_address_openstack
         else:
             mac_address_nios = ref_v_host_record[0]['ipv4addrs'][0]['mac']
             port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'network:dhcp':
-                mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-            else:
-                mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	    ports_list = port_list_openstack['ports']
+            for l in range(len(ports_list)):
+               if ('network:dhcp' == ports_list[l]['device_owner']):
+                   mac_address_openstack = ports_list[l]['mac_address']
             assert mac_address_nios == mac_address_openstack
 
 
@@ -4311,22 +4074,18 @@ class TestOpenStackCases(unittest.TestCase):
         if host_record_ipaddr == ip_address:
             mac_address_nios = ref_v_host_record[0]['ipv4addrs'][0]['mac']
             port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'compute:None':
-                mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-            else:
-                mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	    ports_list = port_list_openstack['ports']
+            for l in range(len(ports_list)):
+                if ('compute:None' == ports_list[l]['device_owner']):
+                    mac_address_openstack = ports_list[l]['mac_address']
             assert mac_address_nios == mac_address_openstack
         else:
             mac_address_nios = ref_v_host_record[1]['ipv4addrs'][0]['mac']
             port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'compute:None':
-                mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-            else:
-                mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	    ports_list = port_list_openstack['ports']
+            for l in range(len(ports_list)):
+               if ('compute:None' == ports_list[l]['device_owner']):
+                   mac_address_openstack = ports_list[l]['mac_address']
             assert mac_address_nios == mac_address_openstack
 
     @pytest.mark.run(order=239)
@@ -4342,24 +4101,20 @@ class TestOpenStackCases(unittest.TestCase):
             mac_add = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=mac'))
             mac_add_nios = mac_add['mac']
             port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'compute:None':
-                mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-            else:
-                mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	    ports_list = port_list_openstack['ports']
+            for l in range(len(ports_list)):
+                if ('compute:None' == ports_list[l]['device_owner']):
+                    mac_address_openstack = ports_list[l]['mac_address']
             assert mac_add_nios == mac_address_openstack
         else:
             ref_v = ref_v_host_address[1]['_ref']
             mac_add = json.loads(wapi_module.wapi_request('GET',object_type=ref_v+'?_return_fields=mac'))
             mac_add_nios = mac_add['mac']
             port_list_openstack = proc.list_ports()
-            device_owner_openstack = port_list_openstack['ports'][0]['device_owner']
-            device_owner1_openstack = port_list_openstack['ports'][1]['device_owner']
-            if device_owner_openstack == 'compute:None':
-                mac_address_openstack = port_list_openstack['ports'][0]['mac_address']
-            else:
-                mac_address_openstack = port_list_openstack['ports'][1]['mac_address']
+	    ports_list = port_list_openstack['ports']
+            for l in range(len(ports_list)):
+                if ('compute:None' == ports_list[l]['device_owner']):
+                    mac_address_openstack = ports_list[l]['mac_address']
             assert mac_add_nios == mac_address_openstack
 
     @pytest.mark.run(order=240)
@@ -4373,5 +4128,4 @@ class TestOpenStackCases(unittest.TestCase):
         session = util.utils()
         delete_net = session.delete_network(network)
         assert delete_net == ()
-
 
