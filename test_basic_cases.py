@@ -124,13 +124,18 @@ class TestOpenStackCases(unittest.TestCase):
 
     @pytest.mark.run(order=8)
     def test_validate_NIOS_Router(self):
+	route_nios = ''
+        route_list = ''
 	proc = wapi_module.wapi_request('GET',object_type = 'network',params="?network="+subnet)
 	resp = json.loads(proc)
         ref_v = resp[0]['_ref']
 	options = json.loads(wapi_module.wapi_request('GET',object_type = ref_v + '?_return_fields=options'))
 	route_list = options['options']
-	list_route = route_list[1]
-	route_nios = list_route['value']
+	for l in range(len(route_list)):
+	     router  = route_list[l]
+	     route_name = router['name']
+	     if route_name == 'routers':	    
+		route_nios = router['value']
 	ip = IPNetwork(subnet).iter_hosts()
         route = str(ip.next())
 	assert route_nios == route
@@ -2077,8 +2082,11 @@ class TestOpenStackCases(unittest.TestCase):
         ref_v = resp[0]['_ref']
         options = json.loads(wapi_module.wapi_request('GET',object_type = ref_v + '?_return_fields=options'))
         route_list = options['options']
-        list_route = route_list[1]
-        route_nios = list_route['value']
+        for l in range(len(route_list)):
+             router  = route_list[l]
+             route_name = router['name']
+             if route_name == 'routers':
+                route_nios = router['value']
         ip = IPNetwork(ext_subnet).iter_hosts()
         route = str(ip.next())
         assert route_nios == route
@@ -4128,4 +4136,3 @@ class TestOpenStackCases(unittest.TestCase):
         session = util.utils()
         delete_net = session.delete_network(network)
         assert delete_net == ()
-
