@@ -490,6 +490,7 @@ class TestOpenStackCases(unittest.TestCase):
 
     @pytest.mark.run(order=31)
     def test_validate_A_Record_SubnetName_as_HostName_Pattern(self):
+	a_record_name = ''
 	ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
 	zone_name = ref_v_zone[0]['fqdn']
 	count = 1
@@ -3853,20 +3854,15 @@ class TestOpenStackCases(unittest.TestCase):
     def test_validate_Host_record_IPAllocationStrategy_as_HostReocrd(self):
         ref_v_zone = json.loads(wapi_module.wapi_request('GET',object_type='zone_auth'))
         zone_name = ref_v_zone[0]['fqdn']
-        ref_v_host_record = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
-        host_record_name = ref_v_host_record[0]['name']
-        host_record_ipaddr = ref_v_host_record[0]['ipv4addrs'][0]['ipv4addr']
-        host1_record_name = ref_v_host_record[1]['name']
-        host1_record_ipaddr = ref_v_host_record[1]['ipv4addrs'][0]['ipv4addr']
-        proc = util.utils()
+	proc = util.utils()
         ip_add = proc.get_instance_ips(instance_name)
         ip_address = ip_add[network][0]['addr']
-        if ip_address == host_record_ipaddr:
-            fqdn = "host-"+'-'.join(ip_address.split('.'))+'-'+tenant_name+'.'+zone_name
-            assert fqdn == host_record_name
-        else:
-            fqdn = "host-"+'-'.join(ip_address.split('.'))+'-'+tenant_name+'.'+zone_name
-            assert fqdn == host1_record_name
+        ref_v_host_record = json.loads(wapi_module.wapi_request('GET',object_type='record:host'))
+	fqdn = "host-"+'-'.join(ip_address.split('.'))+'-'+tenant_name+'.'+zone_name
+	for l in range(len(ref_v_host_record)):
+		if ip_address == ref_v_host_record[l]['ipv4addrs'][0]['ipv4addr']:
+		     host_record_name = ref_v_host_record[l]['name']
+	assert fqdn == host_record_name
 
     @pytest.mark.run(order=234)
     def test_validate_host_record_EAs_IPAllocationStrategy_as_HostReocrd(self):
@@ -4136,3 +4132,4 @@ class TestOpenStackCases(unittest.TestCase):
         session = util.utils()
         delete_net = session.delete_network(network)
         assert delete_net == ()
+

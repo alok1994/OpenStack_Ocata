@@ -48,7 +48,6 @@ class TestOpenStackCases(unittest.TestCase):
 	source("/home/stack/keystone_admin")
    	pass
 
-
     @pytest.mark.run(order=1)
     def test_select_DefaultNetworkView_as_Default_EAs_sync_tool(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
@@ -112,7 +111,7 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=5)
     def test_RUNSYNCTool_network_DefaultNetworkView_as_Default_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -222,7 +221,7 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=13)
     def test_RUNSYNCTool_DefaultNetworkViewScope_as_Tenant_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -276,12 +275,11 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+network_view,delete)):
             flag = True
         assert flag, "Network View failed to delete"
-        #time.sleep(60)
 
     @pytest.mark.run(order=17)
     def test_RUNSYNCTool_NetworkView_DefaultNetworkView_as_Tenant_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -402,12 +400,11 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-        #time.sleep(60)
-
+       
     @pytest.mark.run(order=26)
     def test_RUNSYNCTool_DefaultNetworkViewScope_as_Network_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -461,12 +458,11 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+network_view,delete)):
             flag = True
         assert flag, "Network View failed to delete"
-        #time.sleep(60)
 
     @pytest.mark.run(order=30)
     def test_RUNSYNCTool_NetworkView_DefaultNetworkView_as_Network_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -588,12 +584,11 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-        #time.sleep(60)
-
+       
     @pytest.mark.run(order=39)
     def test_RUNSYNCTool_DefaultNetworkViewScope_as_Subnet_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -647,12 +642,12 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+network_view,delete)):
             flag = True
         assert flag, "Network View failed to delete"
-        #time.sleep(60)
+       
 
     @pytest.mark.run(order=43)
     def test_RUNSYNCTool_NetworkView_DefaultNetworkViewScope_as_Subnet_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -784,12 +779,11 @@ class TestOpenStackCases(unittest.TestCase):
         if (re.search(r""+subnet,delete)):
             flag = True
         assert flag, "Network failed to delete"
-        #time.sleep(60)
-
+        
     @pytest.mark.run(order=53)
     def test_RUNSYNCTool_DefaultNetworkView_as_CustomNetworkView_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -947,7 +941,7 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=64)
     def test_RUNSYNCTool_after_update_TenantName_to_TenantID_EAs_sync_tool(self):
         os.system('rm -rf log.txt')
-        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py > log.txt'
+        cmd = 'python /opt/stack/networking-infoblox/networking_infoblox/tools/sync_neutron_to_infoblox.py >log.txt 2>log.txt'
         proc = commands.getoutput(cmd)
         a=open('log.txt','rb')
         lines = a.readlines()
@@ -1000,5 +994,4 @@ class TestOpenStackCases(unittest.TestCase):
         session = util.utils()
 	delete_net = session.delete_network(network)
 	assert delete_net == ()
-
 

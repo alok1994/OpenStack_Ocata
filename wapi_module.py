@@ -11,10 +11,10 @@ parser.read(CONF)
 GRID_VIP = parser.get('Default', 'GRID_VIP')
 USERNAME = parser.get('Default', 'USERNAME')
 PASSWORD = parser.get('Default', 'PASSWORD')
+VERSION = parser.get('Default', 'WAPI_VERSION')
 DEFAULT_OBJECT_TYPE = 'network'
 URLENCODED = 'application/json'
 DEFAULT_CONTENT_TYPE = URLENCODED
-VERSION = '2.6'
 PATH = '/wapi/v' + VERSION + '/'
 
 logging.basicConfig(filename='output.log',level=logging.DEBUG,filemode='w')
