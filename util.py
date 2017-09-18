@@ -321,4 +321,16 @@ class utils:
 	def delete_port(self, port_id):
             """Deletes the specified port."""
             return self.neutron.delete_port(port_id)
+	
+	def flavor_create(self,flavor_name,CPU,RAM,DISK):
+	    flavor = self.nova_client.flavors.create(name=flavor_name,ram=RAM,vcpus=CPU,disk=DISK)
+	    return flavor
+
+	def flavor_get(self,flavor_name):
+            flavors = self.nova_client.flavors.find(name=flavor_name)
+            return flavors
+	
+	def flavor_list(self,flavor_name):
+            flavors = self.nova_client.flavors.list(flavor_name)
+            return flavors
 
