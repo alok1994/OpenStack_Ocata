@@ -330,7 +330,7 @@ class utils:
             flavors = self.nova_client.flavors.find(name=flavor_name)
             return flavors
 	
-	def flavor_list(self,flavor_name):
-            flavors = self.nova_client.flavors.list(flavor_name)
+	def flavor_list(self):
+            flavors = self.nova_client.flavors.list()
             return flavors
 
