@@ -5,18 +5,31 @@ import os,sys
 from novaclient.client import Client
 import time
 import commands
+import ConfigParser
+
+CONF="config.ini"
+parser = ConfigParser.SafeConfigParser()
+parser.read(CONF)
+Host_IP =  parser.get('Local-Host', 'Host_IP')
+User_Name = parser.get('Local-Host', 'User_Name')
+Password =  parser.get('Local-Host', 'Password')
+Tenant =  parser.get('Local-Host', 'Tenant')
+Project_Name =  parser.get('Local-Host', 'Project_Name')
+Project_Domain_ID = parser.get('Local-Host', 'Project_Domain_ID')
+User_Domain_ID = parser.get('Local-Host', 'User_Domain_ID')
+Keysstone_Version = parser.get('Local-Host', 'Keysstone_Version')
 
 class utils:
 	def __init__(self):
-            username='admin'
-            password='admin'
-	    tenant_name='admin'
-            project_name='admin'
-            project_domain_id='default'
-            user_domain_id='default'
-	    keystone_version = "v3"
+            username=User_Name
+            password=Password
+	    tenant_name=Tenant
+            project_name=Project_Name
+            project_domain_id=User_Domain_ID
+            user_domain_id=User_Domain_ID
+	    keystone_version = Keysstone_Version
 	    if keystone_version == 'v3':
-               auth_url='http://10.39.12.121:5000/v3'
+               auth_url='http://'+Host_IP+':5000/v3'
 	       VERSION = '2'
                auth = identity.Password(auth_url=auth_url,
                              username=username,
@@ -28,7 +41,7 @@ class utils:
                self.neutron = client.Client(session=sess)
 	       self.nova_client = Client(VERSION,session=sess)
 	    else:
-	       auth_url='http://10.39.12.121:5000/v2.0'
+	       auth_url='http://'+Host_IP+':5000/v2.0'
 	       VERSION = '2'
 	       auth = identity.Password(auth_url=auth_url,
 		             tenant_name=tenant_name,
