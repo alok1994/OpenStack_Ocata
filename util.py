@@ -43,8 +43,10 @@ class utils:
 	    Add a Network OpenStack Side
 	      Pass the Network Name as Arg
 	    '''
-            network = {'network': {'name': name, 'admin_state_up': True, 'router:external' : external, 'shared': shared}}
-            netw = self.neutron.create_network(body=network)
+            network_details = {'network': {'name': name, 'admin_state_up': True, 'router:external' : external, 'shared': shared}}
+            networks_body = self.neutron.create_network(body=network_details)
+	    network = networks_body['network']['name']
+            return network
 	
 	def get_network(self,name):
 	    networks_list = self.neutron.list_networks(name)
@@ -69,6 +71,13 @@ class utils:
             network_id = self.get_network_id(name)
 	    delete_net = self.neutron.delete_network(network_id)
             return delete_net
+	
+	def update_network(self,network_name,update_network_name):
+            network = self.get_network_id(network_name)
+	    network_details = {'network': {'name': update_network_name}}
+	    updated_network = self.neutron.update_network(network,body=network_details)
+	    modified_network = updated_network['network']['name']
+            return modified_network
 	
 	def create_subnet(self, network_name, subnet_name, subnet,ip_version = 4):
             """
@@ -102,6 +111,13 @@ class utils:
 	    delete_sub = self.neutron.delete_subnets(sub_id)
 	    return None	    
 
+	def update_subnet(self,subnet_name,update_subnet_name):
+            subnet_id = self.get_subnet_id(subnet_name)
+            subnet_details = {'subnet': {'name': update_subnet_name}}
+            updated_subnet = self.neutron.update_subnet(subnet_id,body=subnet_details)
+            modified_subnet = updated_subnet['subnet']['name']
+            return modified_subnet
+
         def launch_instance(self, name, net_name):
             """
               Return Server Object if the instance is launched successfully
@@ -115,7 +131,6 @@ class utils:
             instance = self.nova_client.servers.create(name=name, image=image,\
                                                        flavor=flavor, nics=nic_id)
 	    count = 60
-	   # timeout = time.time() + 60*1
             while True:
 		instances = self.nova_client.servers.list()
                 for instance in instances:
@@ -176,6 +191,11 @@ class utils:
 		if instances == [] or time.time() > timeout:
 		    return instances
 		    break
+
+	def update_instance(self,updated_server_name):
+	    server_id = self.get_servers_id()
+            updated_instance = self.nova_client.servers.update(server_id,name=updated_server_name)
+	    return updated_instance
 
 	def list_ports(self, retrieve_all=True):
             """
