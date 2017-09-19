@@ -7,14 +7,20 @@ import time
 import util
 import os
 from netaddr import IPNetwork
+import ConfigParser
 
+
+
+CONF="config.ini"
+parser = ConfigParser.SafeConfigParser()
+parser.read(CONF)
+grid_ip = parser.get('Default', 'Grid_VIP')
+grid_master_name = parser.get('Default', 'Master_Domain_Name')
 tenant_name = 'admin'
 network = 'net1'
 subnet_name = "snet"
 instance_name = 'inst'
 subnet = "10.2.0.0/24"
-grid_ip = "10.39.12.121"
-grid_master_name = "infoblox.localdomain"
 custom_net_view = "openstack_view"
 ext_network = "ext_net"
 ext_subnet_name = "ext_sub"
