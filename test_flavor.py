@@ -23,4 +23,8 @@ class TestOpenStackCases(unittest.TestCase):
 	proc = util.utils()
 	proc.flavor_create(flavor_name,CPU,RAM,DISK)
 	flavors = proc.flavor_get(flavor_name)
-	assert flavors == flavor_name
+	flag = False
+	string_fl = str(flavors)
+	if (re.search(r""+flavor_name,string_fl)):
+	    flag = True
+	assert flag
