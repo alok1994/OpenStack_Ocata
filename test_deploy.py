@@ -53,17 +53,19 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instnace_HostNamePattern_as_HostIPAddress(self):
 	proc = util.utils()
 	proc.launch_instance(instance_name,network)
-	instance = proc.get_server_name()
-        status = proc.get_server_status()
+	instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
 	assert instance_name == instance and \
                status == 'ACTIVE'
+
 	
     @pytest.mark.run(order=4)
     def test_terminate_instance_HostNamePattern_as_HostIPAddress(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
-
+        proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
+'''
     @pytest.mark.run(order=5)	
     def test_create_Network_disable_EAs_DHCPSupport_and_DNSSupport(self):
         proc = util.utils()
@@ -93,3 +95,9 @@ class TestOpenStackCases(unittest.TestCase):
         assert flag
         #assert modified_instnace == updated_instance_name
 
+    @pytest.mark.run(order=3)
+    def test_get_server_name(self):
+        proc = util.utils()
+	instance = proc.get_server_name(instance_name)
+	assert instance == instance_name
+'''

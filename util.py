@@ -146,8 +146,9 @@ class utils:
 	    count = 60
             while True:
 		instances = self.nova_client.servers.list()
-                for instance in instances:
-		    status = instance.status
+		for instance in range(len(instances)):
+                  if name == instances[instance].name:
+                     status = instances[instance].status
 		if status != 'ACTIVE' or count <= 0:
 		    time.sleep(1)
 		    count = count - 1
@@ -155,32 +156,35 @@ class utils:
                 break
 
         def get_servers_list(self):
-            """
+            """i
               Return List of Servers
             """
             return self.nova_client.servers.list()
 
-	def get_servers_id(self):
+	def get_servers_id(self,instance_name):
             """
               Return server id
             """ 
             instances = self.nova_client.servers.list()
-	    for instance in instances:
-	        return instance.id
+	    for instance in range(len(instances)):
+                if instance_name == instances[instance].name:
+                    return instances[instance].id
 
-	def get_server_status(self):
+	def get_server_status(self,instance_name):
 	    instances = self.nova_client.servers.list()
-            for instance in instances:
-                return instance.status
+	    for instance in range(len(instances)):
+                if instance_name == instances[instance].name:
+                    return instances[instance].status
 
-	def get_server_name(self):
+	def get_server_name(self,instance_name):
             """
               Return Server Object for a given instance name
             """
 	    instances = self.nova_client.servers.list()
-            for instance in instances:
-                return instance.name
-
+            for instance in range(len(instances)):
+                if instance_name == instances[instance].name:
+		    return instances[instance].name
+		
         def get_server_tenant_id(self):
             instances = self.nova_client.servers.list()
             for instance in instances:
@@ -191,19 +195,22 @@ class utils:
             for instance in instances:
                 return instance.tenant_name
 
-	def terminate_instance(self):
+	def terminate_instance(self,instance_name):
             """
               Terminates an instance
               It takes Instance Name as argument.
             """
-            server = self.get_servers_id()
+            server = self.get_servers_id(instance_name)
             servers = self.nova_client.servers.delete(server)
-            timeout = time.time() + 60*1
+            count = 60
             while True:
-                instances = self.nova_client.servers.list()
-		if instances == [] or time.time() > timeout:
-		    return instances
-		    break
+                check_del=self.get_server_name(instance_name)
+                if check_del != None and count != 0:
+		      time.sleep(1)
+                      count = count - 1
+                      continue
+                else:
+                    break
 
 	def update_instance(self,updated_server_name):
 	    server_id = self.get_servers_id()
