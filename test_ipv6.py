@@ -189,8 +189,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instnace_HostNamePattern_as_HostIPAddress_ipv6(self):
 	proc = util.utils()
 	proc.launch_instance(instance_name,network_ipv6)
-	instance = proc.get_server_name()
-        status = proc.get_server_status()
+	instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
 	assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=13)
@@ -228,8 +228,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -328,8 +328,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -355,8 +355,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=20)
     def test_terminate_instance_HostNamePattern_as_HostIPAddress_ipv6(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=21)
     def test_delete_net_subnet_HostNamePattern_as_HostIPAddress_ipv6(self):
@@ -414,8 +415,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instance_SubnetName_as_HostName_Pattern_ipv6(self):
 	proc = util.utils()
 	proc.launch_instance(instance_name,network_ipv6)
-	instance = proc.get_server_name()
-        status = proc.get_server_status()
+	instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
 	assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=26)
@@ -440,8 +441,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=27)
     def test_terminate_instance_used_SubnetName_as__HostName_pattern_ipv6(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=28)
     def test_delete_subnet_used_NetworkName_as_DomainName_pattern_ipv6(self):
@@ -501,8 +503,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instance_SubnetID_as_HostNamePattern_ipv6(self):
         proc = util.utils()
         proc.launch_instance(instance_name,network_ipv6)
-        instance = proc.get_server_name()
-        status = proc.get_server_status()
+        instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=33)
@@ -529,8 +531,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=34)
     def test_terminate_instance_used_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern_ipv6(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=35)
     def test_delete_subnet_used_NetworkID_as_DomainNamePattern_ipv6(self):
@@ -590,8 +593,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instance_NetworkName_as_HostNamePattern_ipv6(self):
         proc = util.utils()
         proc.launch_instance(instance_name,network_ipv6)
-        instance = proc.get_server_name()
-        status = proc.get_server_status()
+        instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=40)
@@ -617,8 +620,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=41)
     def test_terminate_instance_HostNamePattern_as_NetworkName_ipv6(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=42)
     def test_delete_net_subnet_HostNamePattern_as_NetworkName_ipv6(self):
@@ -678,8 +682,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instance_NetworkID_as_HostNamePattern(self):
         proc = util.utils()
         proc.launch_instance(instance_name,network_ipv6)
-        instance = proc.get_server_name()
-        status = proc.get_server_status()
+        instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=47)
@@ -706,8 +710,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=48)
     def test_terminate_instance_used_SubnetID_as_DomainNamePattern_and_NetworkID_as_HostNamePattern_ipv6(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=49)
     def test_delete_subnet_used_SubnetID_as_DomainNamePattern_ipv6(self):
@@ -823,8 +828,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instnace_CustomNetworkView_ipv6(self):
         proc = util.utils()
         proc.launch_instance(instance_name,network_ipv6)
-        instance = proc.get_server_name()
-        status = proc.get_server_status()
+        instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=58)
@@ -862,8 +867,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -965,8 +970,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -992,8 +997,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=65)
     def test_terminate_instance_CustomNetworkView_ipv6(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=66)
     def test_delete_net_subnet_CustomNetworkView_ipv6(self):
@@ -1112,8 +1118,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instnace_DefaultNetworkViewScope_as_Tenant_ipv6(self):
         proc = util.utils()
         proc.launch_instance(instance_name,network_ipv6)
-        instance = proc.get_server_name()
-        status = proc.get_server_status()
+        instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=75)
@@ -1152,8 +1158,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -1257,8 +1263,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -1284,8 +1290,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=82)
     def test_terminate_instance_DefaultNetworkViewScope_as_Tenant_ipv6(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=83)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Tenant_ipv6(self):
@@ -1393,8 +1400,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instnace_DefaultNetworkViewScope_as_Network_ipv6(self):
         proc = util.utils()
         proc.launch_instance(instance_name,network_ipv6)
-        instance = proc.get_server_name()
-        status = proc.get_server_status()
+        instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=91)
@@ -1432,8 +1439,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -1517,8 +1524,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -1543,8 +1550,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=97)
     def test_terminate_instance_DefaultNetworkViewScope_as_Network_ipv6(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == [] 
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=98)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Network_ipv6(self):
@@ -1652,8 +1660,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instnace_DefaultNetworkViewScope_as_Subnet_ipv6(self):
         proc = util.utils()
         proc.launch_instance(instance_name,network_ipv6)
-        instance = proc.get_server_name()
-        status = proc.get_server_status()
+        instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=106)
@@ -1691,8 +1699,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -1793,8 +1801,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network_ipv6][0]['addr']
@@ -1819,8 +1827,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=113)
     def test_terminate_instance_DefaultNetworkViewScope_as_Subnet(self):
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == []
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=114)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_Subnet(self):
