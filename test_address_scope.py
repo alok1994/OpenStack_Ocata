@@ -138,8 +138,8 @@ class TestOpenStackCases(unittest.TestCase):
     def test_deploy_instnace_DefaultNetworkViewScope_as_AddressScope(self):
         proc = util.utils()
         proc.launch_instance(instance_name,network)
-        instance = proc.get_server_name()
-        status = proc.get_server_status()
+        instance = proc.get_server_name(instance_name)
+        status = proc.get_server_status(instance_name)
         assert instance_name == instance and status == 'ACTIVE'
 
     @pytest.mark.run(order=214)
@@ -171,8 +171,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
@@ -312,8 +312,8 @@ class TestOpenStackCases(unittest.TestCase):
         cmp_type_nios = EAs['extattrs']['CMP Type']['value']
         cloud_api_owned = EAs['extattrs']['Cloud API Owned']['value']
         proc = util.utils()
-        vm_id_openstack = proc.get_servers_id()
-        vm_name_openstack = proc.get_server_name()
+        vm_id_openstack = proc.get_servers_id(instance_name)
+        vm_name_openstack = proc.get_server_name(instance_name)
         vm_tenant_id_openstack = proc.get_server_tenant_id()
         ip_adds = proc.get_instance_ips(instance_name)
         inst_ip_address = ip_adds[network][0]['addr']
@@ -342,8 +342,9 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=222)
     def test_terminate_instance_DefaultNetworkViewScope_as_AddressScope(self)
         proc = util.utils()
-        server = proc.terminate_instance()
-        assert server == None
+	proc.terminate_instance(instance_name)
+	instance = proc.get_server_name(instance_name)
+        assert instance == None
 
     @pytest.mark.run(order=223)
     def test_delete_net_subnet_DefaultNetworkViewScope_as_AddressScope(self):
