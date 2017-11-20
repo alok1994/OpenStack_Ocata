@@ -58,8 +58,10 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=2)
     def test_EAs_disable_DHCPSupport_and_DNSSupport(self):
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
-        ref = ref_v[0]['_ref']
-        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+	for i in range(len(ref_v)):
+          if ref_v[i]['host_name'] == grid_master_name:
+            ref = ref_v[i]['_ref']
+            data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
                 "Allow Service Restart": {"value": "True"},\
                 "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "False"},\
                 "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
@@ -80,12 +82,12 @@ class TestOpenStackCases(unittest.TestCase):
                 "Tenant Name Persistence": {"value": "True"},\
                 "Use Grid Master for DHCP": {"value": "True"},\
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
-        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
-        flag = False
-        if (re.search(r""+grid_master_name,proc)):
-            flag = True
-        assert proc != "" and flag
-	time.sleep(20)
+            proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+            flag = False
+            if (re.search(r""+grid_master_name,proc)):
+              flag = True
+            assert proc != "" and flag
+	    time.sleep(20)
 
     @pytest.mark.run(order=3)	
     def test_create_Network_disable_EAs_DHCPSupport_and_DNSSupport(self):
@@ -164,8 +166,11 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=10)
     def test_select_enable_DHCPSupport_DNSSupport_DomainNamePattern_as_TenantName_EAs(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
-	ref = ref_v[0]['_ref']
-	data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        for i in range(len(ref_v)):
+          if ref_v[i]['host_name'] == grid_master_name:
+            ref = ref_v[i]['_ref']
+	    data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
                 "Allow Service Restart": {"value": "True"},\
                 "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
                 "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
@@ -186,11 +191,11 @@ class TestOpenStackCases(unittest.TestCase):
                 "Tenant Name Persistence": {"value": "True"},\
                 "Use Grid Master for DHCP": {"value": "True"},\
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}} 
-	proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
-	flag = False
-        if (re.search(r""+grid_master_name,proc)):
-            flag = True
-        assert proc != "" and flag
+	    proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+	    flag = False
+            if (re.search(r""+grid_master_name,proc)):
+              flag = True
+            assert proc != "" and flag
 
     @pytest.mark.run(order=11)
     def test_create_network_DHCPSupport_DNSSupport_DomainNamePattern_as_TenantName_EAs(self):
@@ -439,8 +444,11 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=26)
     def test_EAs_SubnetName_as_HostName_pattern_and_NetworkName_as_DomainName_pattern(self):
 	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
-	ref = ref_v[0]['_ref']
-	data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        for i in range(len(ref_v)):
+          if ref_v[i]['host_name'] == grid_master_name:
+            ref = ref_v[i]['_ref']
+	    data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
                 "Allow Service Restart": {"value": "True"},\
                 "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
                 "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
@@ -461,11 +469,11 @@ class TestOpenStackCases(unittest.TestCase):
                 "Tenant Name Persistence": {"value": "False"},\
                 "Use Grid Master for DHCP": {"value": "True"},\
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}} 
-	proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
-	flag = False
-        if (re.search(r""+grid_master_name,proc)):
-            flag = True
-        assert proc != "" and flag
+	    proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+	    flag = False
+            if (re.search(r""+grid_master_name,proc)):
+               flag = True
+            assert proc != "" and flag
 
     @pytest.mark.run(order=27)
     def test_create_network_NetworkName_as_DomainName_Pattern_openstack_side(self):
@@ -526,8 +534,11 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=33)
     def test_EAs_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern(self):
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
-        ref = ref_v[0]['_ref']
-        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+   	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        for i in range(len(ref_v)):
+          if ref_v[i]['host_name'] == grid_master_name:
+            ref = ref_v[i]['_ref']
+            data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
                 "Allow Service Restart": {"value": "True"},\
                 "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
                 "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
@@ -548,11 +559,11 @@ class TestOpenStackCases(unittest.TestCase):
                 "Tenant Name Persistence": {"value": "False"},\
                 "Use Grid Master for DHCP": {"value": "True"},\
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
-        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
-        flag = False
-        if (re.search(r""+grid_master_name,proc)):
-            flag = True
-        assert proc != "" and flag
+            proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+            flag = False
+            if (re.search(r""+grid_master_name,proc)):
+               flag = True
+            assert proc != "" and flag
 
     @pytest.mark.run(order=34)
     def test_create_network_NetworkID_as_DomainNamePattern_and_SubnetID_as_HostNamePattern(self):
@@ -617,8 +628,11 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=40)
     def test_EAs_SubnetName_as_DomainNamePattern_and_NetworkName_as_HostNamePattern(self):
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
-        ref = ref_v[0]['_ref']
-        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+  	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        for i in range(len(ref_v)):
+          if ref_v[i]['host_name'] == grid_master_name:
+            ref = ref_v[i]['_ref']
+            data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
                 "Allow Service Restart": {"value": "True"},\
                 "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
                 "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
@@ -639,11 +653,11 @@ class TestOpenStackCases(unittest.TestCase):
                 "Tenant Name Persistence": {"value": "False"},\
                 "Use Grid Master for DHCP": {"value": "True"},\
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
-        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
-        flag = False
-        if (re.search(r""+grid_master_name,proc)):
-            flag = True
-        assert proc != "" and flag
+            proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+            flag = False
+            if (re.search(r""+grid_master_name,proc)):
+               flag = True
+            assert proc != "" and flag
 
     @pytest.mark.run(order=41)
     def test_create_network_SubnetName_as_DomainNamePattern_and_NetworkName_as_HostNamePattern(self):
@@ -706,8 +720,11 @@ class TestOpenStackCases(unittest.TestCase):
     @pytest.mark.run(order=47)
     def test_EAs_SubnetID_as_DomainNamePattern_and_NetworkID_as_HostNamePattern(self):
         ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
-        ref = ref_v[0]['_ref']
-        data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
+  	ref_v = json.loads(wapi_module.wapi_request('GET',object_type='member'))
+        for i in range(len(ref_v)):
+          if ref_v[i]['host_name'] == grid_master_name:
+            ref = ref_v[i]['_ref']
+            data = {"extattrs":{"Admin Network Deletion": {"value": "True"},\
                 "Allow Service Restart": {"value": "True"},\
                 "Allow Static Zone Deletion":{"value": "True"},"DHCP Support": {"value": "True"},\
                 "DNS Record Binding Types": {"value":["record:a","record:aaaa","record:ptr"]},\
@@ -728,11 +745,11 @@ class TestOpenStackCases(unittest.TestCase):
                 "Tenant Name Persistence": {"value": "False"},\
                 "Use Grid Master for DHCP": {"value": "True"},\
                 "Zone Creation Strategy": {"value": ["Forward","Reverse"]}}}
-        proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
-        flag = False
-        if (re.search(r""+grid_master_name,proc)):
-            flag = True
-        assert proc != "" and flag
+            proc = wapi_module.wapi_request('PUT',object_type=ref,fields=json.dumps(data))
+            flag = False
+            if (re.search(r""+grid_master_name,proc)):
+               flag = True
+            assert proc != "" and flag
 
     @pytest.mark.run(order=48)
     def test_create_network_SubnetID_as_DomainNamePattern_and_NetworkID_as_HostNamePattern(self):
