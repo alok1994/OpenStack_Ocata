@@ -137,7 +137,7 @@ class utils:
         
               It takes Instance Name and the Network Name it should be associated with as arguments.
             """
-            image = self.nova_client.images.find(name="cirros-0.3.4-x86_64-uec")
+            image = self.nova_client.images.find(name="cirros-0.3.3-x86_64-disk")
             flavor = self.nova_client.flavors.find(name="m1.nano")
             net_id  = self.get_network_id(net_name)
 	    nic_id = [{'net-id': net_id}]
@@ -212,8 +212,8 @@ class utils:
                 else:
                     break
 
-	def update_instance(self,updated_server_name):
-	    server_id = self.get_servers_id()
+	def update_instance(self,instance_name,updated_server_name):
+	    server_id = self.get_servers_id(instance_name)
             updated_instance = self.nova_client.servers.update(server_id,name=updated_server_name)
 	    return updated_instance
 
