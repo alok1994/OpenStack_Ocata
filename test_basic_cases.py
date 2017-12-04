@@ -2404,7 +2404,7 @@ class TestOpenStackCases(unittest.TestCase):
                 "Default Network View": {"value": "default"},\
                 "Default Network View Scope": {"value": "Single"},\
                 "External Domain Name Pattern": {"value": "{subnet_name}.external.global.com"},\
-                "External Host Name Pattern": {"value": "{instance_name}-{instance_id}"},\
+                "External Host Name Pattern": {"value": "{instance_name}"},\
                 "Grid Sync Maximum Wait Time": {"value": 10},\
                 "Grid Sync Minimum Wait Time": {"value": 10},"Grid Sync Support": {"value": "True"},\
                 "IP Allocation Strategy": {"value": "Fixed Address"},\
@@ -2473,7 +2473,7 @@ class TestOpenStackCases(unittest.TestCase):
             break
         proc = util.utils()
         instance_id_openstack = proc.get_servers_id(instance_name)
-        assert a_record_name == instance_name+'-' +instance_id_openstack+ '.' +zone_name
+        assert a_record_name == instance_name+'.' +zone_name
 
     @pytest.mark.run(order=153)
     def test_validate_a_record_EAs_ExternalHostNamePattern_as_InstanceNameInstanceID(self):

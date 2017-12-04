@@ -2226,7 +2226,7 @@ class TestOpenStackCases(unittest.TestCase):
             ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
             if ref_v_a_record == []:
                 count = count + 1
-                time.sleep(1)
+                time.sleep(5)
                 continue
             a_record_name = ref_v_a_record[0]['name']
             break
@@ -2493,7 +2493,7 @@ class TestOpenStackCases(unittest.TestCase):
             ref_v_a_record = json.loads(wapi_module.wapi_request('GET',object_type='record:a'))
             if ref_v_a_record == []:
                 count = count + 1
-                time.sleep(1)
+                time.sleep(3)
                 continue
             a_record_name = ref_v_a_record[0]['name']
             break
@@ -4119,6 +4119,7 @@ class TestOpenStackCases(unittest.TestCase):
 	proc = util.utils()
 	modified_network = proc.update_network(network,Modify_Network_name)
 	assert modified_network == Modify_Network_name
+	time.sleep(10)
 
     @pytest.mark.run(order=245)
     def test_Validate_EAs_AfterModifiedNetworkName(self):
@@ -4247,6 +4248,7 @@ class TestOpenStackCases(unittest.TestCase):
 	proc.terminate_instance(updated_instance_name)
 	instance = proc.get_server_name(updated_instance_name)
         assert instance == None
+
 
     @pytest.mark.run(order=253)
     def test_delete_UpdateNetworkSubnetNameCases(self):

@@ -29,7 +29,7 @@ def wapi_request(operation, ref='', params='', fields='', \
     '''
     # Create connection and request header.
     # This class does not perform any verification of the server`s certificate.
-    conn = httplib.HTTPSConnection(GRID_VIP,context=ssl._create_unverified_context())
+    conn = httplib.HTTPSConnection(GRID_VIP)
     auth_header = 'Basic %s' % (':'.join([USERNAME, PASSWORD])
                                 .encode('Base64').strip('\r\n'))
     request_header = {'Authorization':auth_header,
